@@ -1,1 +1,1 @@
-# Capn-Valorant-Statistics-App
+# Capn - Valorant Statistics App
