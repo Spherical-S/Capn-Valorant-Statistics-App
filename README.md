@@ -5,6 +5,7 @@ CAPN - Valorant Statistics is an application designed to help valorant players f
 
 Current stats available include:
   * Rank - Find out any players rank with just their name and tag
+
     <img src="https://cdn.discordapp.com/attachments/481651297817329664/967908700394242079/unknown.png" alt="Rank Command" width="500"/>
   
   * Store - Find out whats in your valorant store and your current balance without having to launch valorant
