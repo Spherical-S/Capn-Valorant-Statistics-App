@@ -10,6 +10,8 @@ Current stats available include:
   * Match Skins - Find out the skins people in your lobby have equipped, perfect for all you skin whores who want to beg your team for a skin drop (still under development)
  
 
+Thanks to the Valorant App Developers discord server for some help, would not be possible without that community. Special credits to techchrism on github for documenting the riot api, Henrikdev for their valorant api and Officer for their valorant api as well!
+
 
 I am a begginer python programmer with little expirience with creating UI's so it is not super polished, but I will continue to update the app to the users standards! That being said, if you have a suggestion or found a bug/glitch, please contact me on discord (tiddybite#6304)
 
