@@ -11,4 +11,4 @@ Current stats available include:
  
 
 
-I am a begginer python programmer with little expirience with creating UI's so it is not super polished, but I will continue to update the app to the users standards!
+I am a begginer python programmer with little expirience with creating UI's so it is not super polished, but I will continue to update the app to the users standards! That being said, if you have a suggestion or found a bug/glitch, please contact me on discord (tiddybite#6304)
