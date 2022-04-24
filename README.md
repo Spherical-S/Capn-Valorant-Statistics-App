@@ -1,5 +1,5 @@
 # CAPN - Valorant Statistics App
-[![Donate](https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png)](https://ko-fi.com/spherical)
+[![Donate](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/spherical)
 
 Version: 1.0.0
 
