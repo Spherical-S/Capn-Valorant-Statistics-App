@@ -1,6 +1,4 @@
 # CAPN - Valorant Statistics App
-[![Donate](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/spherical)
-
 Version: 1.0.0
 
 CAPN - Valorant Statistics is an application deseigned to help valorant players find out cool statistics easily. All you have to do is download the app, launch it, and get whatever data you need!
@@ -14,3 +12,7 @@ Current stats available include:
 
 
 I am a begginer python programmer with little expirience with creating UI's so it is not super polished, but I will continue to update the app to the users standards! That being said, if you have a suggestion or found a bug/glitch, please contact me on discord (tiddybite#6304)
+
+Want to support me? click the button below to go to my donation page!
+
+[![Donate](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/spherical)
