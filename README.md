@@ -5,7 +5,7 @@ CAPN - Valorant Statistics is an application designed to help valorant players f
 
 Current stats available include:
   * Rank - Find out any players rank with just their name and tag
-  * ![alt text](https://cdn.discordapp.com/attachments/481651297817329664/967908700394242079/unknown.png)
+  <img src="https://cdn.discordapp.com/attachments/481651297817329664/967908700394242079/unknown.png" alt="Rank Command" width="200"/>
   * Store - Find out whats in your valorant store and your current balance without having to launch valorant
   * Match Stats - Find out everyone in your current lobbies rank, rr, and peak rank
   * Match Skins - Find out the skins people in your lobby have equipped, perfect for all you skin whores who want to beg your team for a skin drop (still under development)
