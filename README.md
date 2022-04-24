@@ -1,3 +1,5 @@
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Y8Y0C2CAM)
+
 # CAPN - Valorant Statistics App
 Version: 1.0.0
 
