@@ -1,7 +1,7 @@
 # CAPN - Valorant Statistics App
 Version: 1.0.0
 
-CAPN - Valorant Statistics is an application deseigned to help valorant players find out cool statistics easily. All you have to do is download the app, launch it, and get whatever data you need!
+CAPN - Valorant Statistics is an application designed to help valorant players find out cool statistics easily. All you have to do is download the app, launch it, and get whatever data you need!
 
 Current stats available include:
   * Rank - Find out any players rank with just their name and tag
