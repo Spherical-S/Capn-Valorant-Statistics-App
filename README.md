@@ -1,5 +1,4 @@
 # CAPN - Valorant Statistics App
-[![Donations Badge](https://yourdonation.rocks/images/badge.svg)]({https://ko-fi.com/spherical})
 Version: 1.0.0
 
 CAPN - Valorant Statistics is an application deseigned to help valorant players find out cool statistics easily. All you have to do is download the app, launch it, and get whatever data you need!
