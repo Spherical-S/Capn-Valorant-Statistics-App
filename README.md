@@ -23,9 +23,9 @@ Current stats available include:
 
 # Current issues/bugs that will be fixed in the next update(s)
 
-*Orbitron font is not available on some peoples computers
-*Multifactorauth.exe file size is pretty large for no apparent reason
-*Installer sometimes detected as a virus
+* Orbitron font is not available on some peoples computers
+* Multifactorauth.exe file size is pretty large for no apparent reason
+* Installer sometimes detected as a virus
 
 
 # Credits and support
