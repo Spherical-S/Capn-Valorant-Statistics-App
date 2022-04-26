@@ -21,6 +21,15 @@ Current stats available include:
   * Match Skins - Find out the skins people in your lobby have equipped, perfect for all you skin whores who want to beg your team for a skin drop (still under development)
  
 
+# Current issues/bugs that will be fixed in the next update(s)
+
+*Orbitron font is not available on some peoples computers
+*Multifactorauth.exe file size is pretty large for no apparent reason
+*Installer sometimes detected as a virus
+
+
+# Credits and support
+
 Thanks to the Valorant App Developers discord server for some help, would not be possible without that community. Special credits to techchrism on github for documenting the riot api, Henrikdev for their valorant api and Officer for their valorant api as well!
 
 
