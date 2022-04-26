@@ -24,6 +24,7 @@ Current stats available include:
 # Current issues/bugs that will be fixed in the next update(s)
 
 * Orbitron font is not available on some peoples computers
+* App must be run in administrator mode, it will not open unless admin permission is granted
 * Multifactorauth.exe file size is pretty large for no apparent reason
 * Installer sometimes detected as a virus
 
