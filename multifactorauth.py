@@ -9,7 +9,7 @@ def submit():
         tkinter.messagebox.showwarning("Input Error", "2FA code should be 6 digits!")
         return
     if not code.isdigit():
-        tkinter.messagebox.showwarning("Input Error", "2FA code should be 6 numerical characters!")
+        tkinter.messagebox.showwarning("Input Error", "2FA code should be numerical characters!")
         return
     f = open("multifactor.json", "r")
     old = load(f)
