@@ -574,8 +574,8 @@ def login(self):
         if authorization[0] == "-1":
             error_label['text'] = "Invalid logins!"
         else:
-            logins['username'] = encrypt(username, environ.get('CAPNKEY'))
-            logins['password'] = encrypt(password, environ.get('CAPNKEY'))
+            logins['username'] = encrypt(username, enc_key)
+            logins['password'] = encrypt(password, enc_key)
             logins['region'] = region
             logins['token'] = ""
             logins['entitlement'] = ""
@@ -601,8 +601,9 @@ def login(self):
 try: # Put it all in a try... except to catch all errors and log them
     ### INITIALIZING IMPORTANT VARIABLES ###
     PURPLE = "#400080"
-    current_version = "1.0.0"
+    current_version = "1.0.2"
     region = ""
+    enc_key = "0"
     logins = {}
     selected_command = 0
     args_list = []
@@ -642,11 +643,14 @@ try: # Put it all in a try... except to catch all errors and log them
 
     #Checking if the key for encrypting is set
     if len(environ['CAPNKEY']) != 8:
+        enc_key = util.randomString(8)
         f = open('.env', 'w')
         f.truncate(0)
-        f.write(f'NOTE = "DO NOT CHANGE ANYTHING IN THIS FILE OR CAPN MAY NOT WORK"\nCAPNKEY = "{util.randomString(8)}"')
+        f.write(f'NOTE = "DO NOT CHANGE ANYTHING IN THIS FILE OR CAPN MAY NOT WORK"\nCAPNKEY = "{enc_key}"')
         f.close()
         load_dotenv()
+    else:
+        enc_key = environ['CAPNKEY']
 
     #### CHECKING FOR UPDATE ####
     r = get(url='https://raw.githubusercontent.com/Spherical-S/Capn-Valorant-Statistics-App/main/Verion.txt')
