@@ -27,6 +27,7 @@ Current stats available include:
 * App must be run in administrator mode, it will not open unless admin permission is granted (Fixed in next update)
 * Multifactorauth.exe file size is pretty large for no apparent reason (Fixed in next update)
 * Installer sometimes detected as a virus
+* Have to login twice on the first startup
 
 
 # Credits and support
