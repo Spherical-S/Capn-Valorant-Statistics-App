@@ -1,8 +1,7 @@
 import tkinter.messagebox
 from tkinter import *
-import random
-import json
-
+from random import randint
+from json import dump, load
 
 def submit():
     code = code_input.get()
@@ -13,13 +12,13 @@ def submit():
         tkinter.messagebox.showwarning("Input Error", "2FA code should be 6 numerical characters!")
         return
     f = open("multifactor.json", "r")
-    old = json.load(f)
+    old = load(f)
     f.close()
-    temp = {"check": random.randint(100, 999), "code": f"{code}"}
+    temp = {"check": randint(100, 999), "code": f"{code}"}
     while temp['check'] == old['check']:
-        temp = {"check": random.randint(100, 999), "code": f"{code}"}
+        temp = {"check": randint(100, 999), "code": f"{code}"}
     f = open("multifactor.json", "w")
-    json.dump(temp, f)
+    dump(temp, f)
     f.close()
     mfa_win.destroy()
 
