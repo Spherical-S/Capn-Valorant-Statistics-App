@@ -3,6 +3,8 @@ import concurrent.futures
 import logging
 from tkinter import *
 from tkinter import messagebox
+from pyglet import font
+import tkinter.font as TkFont
 from auth import *
 from json import load, dump
 from PIL import Image, ImageTk
@@ -13,6 +15,8 @@ from datetime import datetime
 from traceback import print_exc
 from cryptocode import encrypt, decrypt
 from dotenv import load_dotenv
+from ctypes import windll
+from sys import executable, argv
 load_dotenv()
 
 
@@ -559,12 +563,6 @@ def selectRegion(regionNum):
 def login(self):
     global region
     logging.info('made it into login()')
-    if len(environ['CAPNKEY']) != 8:
-        f = open('.env', 'w')
-        f.truncate(0)
-        f.write(f'NOTE = "DO NOT CHANGE ANYTHING IN THIS FILE OR CAPN MAY NOT WORK"\nCAPNKEY = "{util.randomString(8)}"')
-        f.close()
-        load_dotenv()
     error_label['text'] = "Checking logins, please wait!"
     window.update()
     username = username_input.get()
@@ -572,10 +570,7 @@ def login(self):
     if username == "" or password == "" or region == "":
         error_label['text'] = "Missing fields!"
     else:
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            future = executor.submit(getAuth, username, password)
-            authorization = future.result()
-        # authorization = await getAuth(username, password)
+        authorization = getAuth(username, password)
         if authorization[0] == "-1":
             error_label['text'] = "Invalid logins!"
         else:
@@ -624,6 +619,35 @@ try: # Put it all in a try... except to catch all errors and log them
     f.truncate(0)
     f.close()
 
+    #### CREATING STARTUP UI ####
+    # Checking to see if the Orbitron font exists on the machine
+    window = Tk()
+    if not ('Orbitron' in TkFont.families()):
+        font.add_file('Orbitron-Bold.ttf')
+    window.geometry("900x500")
+    window.title("Capn")
+    icon = PhotoImage(file="icon.ico")
+    window.iconphoto(True, icon)
+    window.config(background=PURPLE)
+    window.resizable(False, False)
+    check_logins_label = Label(window, text="Checking logins... Please wait\n(may take up to 15 seconds)", font=('Orbitron', 25), fg="black", bg=PURPLE)
+    check_logins_label.pack()
+    window.update()
+    util.internet()
+
+    #Checking if app is in admin mode
+    if not windll.shell32.IsUserAnAdmin():
+        windll.shell32.ShellExecuteW(None, "runas", executable, " ".join(argv), None, 1)
+        #messagebox.showwarning("No Administrator Privileges!", "Running Capn is recommended with administrator privileges!\nTo run Capn in admin:\n1. Right click the Capn app\n2. Select run as administrator.")
+
+    #Checking if the key for encrypting is set
+    if len(environ['CAPNKEY']) != 8:
+        f = open('.env', 'w')
+        f.truncate(0)
+        f.write(f'NOTE = "DO NOT CHANGE ANYTHING IN THIS FILE OR CAPN MAY NOT WORK"\nCAPNKEY = "{util.randomString(8)}"')
+        f.close()
+        load_dotenv()
+
     #### CHECKING FOR UPDATE ####
     r = get(url='https://raw.githubusercontent.com/Spherical-S/Capn-Valorant-Statistics-App/main/Verion.txt')
     version = str(r.content)[2:7]
@@ -632,19 +656,6 @@ try: # Put it all in a try... except to catch all errors and log them
         if update:
             hyperlink('https://github.com/Spherical-S/Capn-Valorant-Statistics-App/releases')
 
-
-    #### CREATING STARTUP UI ####
-    window = Tk()
-    window.geometry("900x500")
-    window.title("Capn")
-    icon = PhotoImage(file="icon.ico")
-    window.iconphoto(True, icon)
-    window.config(background=PURPLE)
-    window.resizable(False, False)
-    check_logins_label = Label(window, text="Checking logins... Please wait\n(may take up to 15 seconds)", font=("Orbitron", 25), fg="black", bg=PURPLE)
-    check_logins_label.pack()
-    window.update()
-    util.internet()
     logins_check = checkLogins()
     ### CHECK LOGINS AND GET TOKEN, ENTITLEMENT AND PUUID ###
     if logins_check[0] == 0:
@@ -659,6 +670,11 @@ try: # Put it all in a try... except to catch all errors and log them
         logins['username'] = ""
         logins['password'] = ""
         logins['region'] = ""
+        logins['token'] = ""
+        logins['entitlement'] = ""
+        logins['puuid'] = ""
+        logins['mfa'] = ""
+        logins['expiry'] = ""
         f = open("config.json", "w")
         dump(logins, f)
         f.close()
