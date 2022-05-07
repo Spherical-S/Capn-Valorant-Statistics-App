@@ -22,7 +22,7 @@ Current stats available include:
  
 
 # Current issues/bugs that will be fixed in the next update(s)
-* Have to login twice on the first startup (fixed in next update)
+* Have to restart app to login/logout (fixed in 1.0.3 which will release soon!)
 
 
 # Credits and support
