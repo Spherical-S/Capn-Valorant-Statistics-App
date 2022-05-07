@@ -724,7 +724,6 @@ try: # Put it all in a try... except to catch all errors and log them
         f = open("config.json", 'r')
         logins = load(f)
         f.close()
-        print(logins)
         displayMainMenu()
         window.bind('<Return>', lambda event: submitCommand())
     elif logins_check[0] == 1:
