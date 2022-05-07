@@ -1,5 +1,4 @@
 import util
-import concurrent.futures
 import logging
 from tkinter import *
 from tkinter import messagebox
@@ -42,7 +41,7 @@ def updateSelectedCommand(cmd):
         main_menu[8]['bg'] = PURPLE
         resetArguments()
         args_list.clear()
-        name_entry = Entry(window, font=("Orbitron", 20), fg="black", bg="white", width=12)
+        name_entry = Entry(window, font=("Orbitron", 20), fg=BLACK, bg="white", width=12)
         args_list.append(name_entry)
         var = StringVar(window)
         temp = ['na', 'eu', 'ap', 'kr']
@@ -202,7 +201,7 @@ def submitCommand():
 def displayMainMenu():
     global main_menu
     main_menu.clear()
-    title_label = Label(window, text="Aye Aye Capn!", font=("Orbitron", 25), fg="black", bg=PURPLE)
+    title_label = Label(window, text="Aye Aye Capn!", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
     main_menu.append(title_label) #0
     rank_button = Button(window, cursor="hand2", text="Rank", font=("Orbitron", 20), bg=PURPLE, width=10, command=lambda: updateSelectedCommand(1))
     main_menu.append(rank_button) #1
@@ -220,9 +219,9 @@ def displayMainMenu():
     main_menu.append(error_label) #7
     help_button = Button(window, cursor="hand2", text="Help", font=("Orbitron", 20), bg=PURPLE, width=10, command=lambda: updateSelectedCommand(6))
     main_menu.append(help_button)  # 8
-    created_by = Label(window, text="Created by Spherical-S on github", font=("Orbitron", 12), fg="black", bg=PURPLE)
+    created_by = Label(window, text="Created by Spherical-S on github", font=("Orbitron", 12), fg=BLACK, bg=PURPLE)
     main_menu.append(created_by) # 9
-    logged_in_as = Label(window, text=f"Logged in as {decrypt(logins['username'], environ.get('CAPNKEY'))}", font=("Orbitron", 12), fg="black", bg=PURPLE)
+    logged_in_as = Label(window, text=f"Logged in as {decrypt(logins['username'], environ.get('CAPNKEY'))}", font=("Orbitron", 12), fg=BLACK, bg=PURPLE)
     main_menu.append(logged_in_as) # 10
     title_label.place(x=311, y=5)
     rank_button.place(x=70, y=85)
@@ -239,9 +238,9 @@ def displayMainMenu():
 
 def displayRankMenu(player, tag, region, act):
     util.internet()
-    loading_label = Label(window, text="Loading...", font=("Orbitron", 25), fg="black", bg=PURPLE)
+    loading_label = Label(window, text="Loading...", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
     loading_label.pack()
-    loading_sublabel = Label(window, text="Please wait while the rank is being fetched", font=("Orbitron", 15), fg="black", bg=PURPLE)
+    loading_sublabel = Label(window, text="Please wait while the rank is being fetched", font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
     loading_sublabel.pack()
     window.update()
     if act == "current":
@@ -250,19 +249,19 @@ def displayRankMenu(player, tag, region, act):
     image = Image.open(f"visualcontent\\{str(output[3])}.png")
     image = image.resize((200, 200))
     window.img = ImageTk.PhotoImage(image)
-    title_label = Label(window, text="Rank", font=("Orbitron", 25), fg="black", bg=PURPLE)
+    title_label = Label(window, text="Rank", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
     current_menu.append(title_label) #0
     back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, command=submitCommand)
     current_menu.append(back_button) #1
-    subtitle_label = Label(window, text=f"{player}#{tag} from {region}'s rank", font=("Orbitron", 15), fg="black", bg=PURPLE)
+    subtitle_label = Label(window, text=f"{player}#{tag} from {region}'s rank", font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
     current_menu.append(subtitle_label)  #2
-    rank_label = Label(window, text=f"Rank in {act}: {output[1]}, {output[2]} RR", font=("Orbitron", 18), fg="black", bg=PURPLE)
+    rank_label = Label(window, text=f"Rank in {act}: {output[1]}, {output[2]} RR", font=("Orbitron", 18), fg=BLACK, bg=PURPLE)
     current_menu.append(rank_label)  #3
-    max_rank_label = Label(window, text=f"Peak Rank: {output[4]}", font=("Orbitron", 18), fg="black", bg=PURPLE)
+    max_rank_label = Label(window, text=f"Peak Rank: {output[4]}", font=("Orbitron", 18), fg=BLACK, bg=PURPLE)
     current_menu.append(max_rank_label)  #4
-    max_act_label = Label(window, text=f"Peak Rank Act: {output[6]}", font=("Orbitron", 18), fg="black", bg=PURPLE)
+    max_act_label = Label(window, text=f"Peak Rank Act: {output[6]}", font=("Orbitron", 18), fg=BLACK, bg=PURPLE)
     current_menu.append(max_act_label)  #5
-    note_label = Label(window, text=f"{output[7]}", font=("Orbitron", 18), fg="black", bg=PURPLE)
+    note_label = Label(window, text=f"{output[7]}", font=("Orbitron", 18), fg=BLACK, bg=PURPLE)
     current_menu.append(note_label)  #6
     rank_image = Label(window, image=window.img, bg=PURPLE)
     current_menu.append(rank_image)
@@ -281,9 +280,9 @@ def displayRankMenu(player, tag, region, act):
 def displayStore():
     global current_skin
     util.internet()
-    loading_label = Label(window, text="Loading...", font=("Orbitron", 25), fg="black", bg=PURPLE)
+    loading_label = Label(window, text="Loading...", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
     loading_label.pack()
-    loading_sublabel = Label(window, text="Please wait while your store is being fetched", font=("Orbitron", 15),fg="black", bg=PURPLE)
+    loading_sublabel = Label(window, text="Please wait while your store is being fetched", font=("Orbitron", 15),fg=BLACK, bg=PURPLE)
     loading_sublabel.pack()
     window.update()
     t = logins_check[1]
@@ -296,7 +295,7 @@ def displayStore():
     current_skin = 0
     for i in range(len(store['uuids'])):
         window.temp.append(util.photoImagify(f"https://media.valorant-api.com/weaponskinlevels/{store['uuids'][i]}/displayicon.png"))
-    title_label = Label(window, text="Store", font=("Orbitron", 25), fg="black", bg=PURPLE)
+    title_label = Label(window, text="Store", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
     current_menu.append(title_label)  #0
     back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, command=submitCommand)
     current_menu.append(back_button)  #1
@@ -307,14 +306,14 @@ def displayStore():
     image = Image.open(f"visualcontent\\vp.png")
     image = image.resize((40, 40))
     window.vpimg = ImageTk.PhotoImage(image)
-    vp_label = Label(window, text=f": {balance[0]}", font=("Orbitron", 15), bg=PURPLE, fg="black", image=window.vpimg, compound="left")
+    vp_label = Label(window, text=f": {balance[0]}", font=("Orbitron", 15), bg=PURPLE, fg=BLACK, image=window.vpimg, compound="left")
     current_menu.append(vp_label) #4
     image = Image.open(f"visualcontent\\rp.png")
     image = image.resize((40, 40))
     window.rpimg = ImageTk.PhotoImage(image)
-    rp_label = Label(window, text=f": {balance[1]}", font=("Orbitron", 15), bg=PURPLE, fg="black", image=window.rpimg, compound="left")
+    rp_label = Label(window, text=f": {balance[1]}", font=("Orbitron", 15), bg=PURPLE, fg=BLACK, image=window.rpimg, compound="left")
     current_menu.append(rp_label) #5
-    skin_label = Label(window, text=f"{store['displayNames'][0][:40]}", font=("Orbitron", 20), fg="black", bg=PURPLE, image=window.temp[0], compound="top")
+    skin_label = Label(window, text=f"{store['displayNames'][0][:40]}", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, image=window.temp[0], compound="top")
     current_menu.append(skin_label) #6
     loading_sublabel.destroy()
     loading_label.destroy()
@@ -330,9 +329,9 @@ def displayStore():
 def displayMatchStats():
     global displayData
     util.internet()
-    loading_label = Label(window, text="Loading...", font=("Orbitron", 25), fg="black", bg=PURPLE)
+    loading_label = Label(window, text="Loading...", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
     loading_label.pack()
-    loading_sublabel = Label(window, text="Please wait while your match stats are being fetched", font=("Orbitron", 15), fg="black", bg=PURPLE)
+    loading_sublabel = Label(window, text="Please wait while your match stats are being fetched", font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
     loading_sublabel.pack()
     window.update()
     t = logins_check[1]
@@ -343,11 +342,11 @@ def displayMatchStats():
     if output['status'] == -1:
         loading_sublabel.destroy()
         loading_label.destroy()
-        title_label = Label(window, text="Match Stats", font=("Orbitron", 25), fg="black", bg=PURPLE)
+        title_label = Label(window, text="Match Stats", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
         current_menu.append(title_label)  #0
         back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, command=submitCommand)
         current_menu.append(back_button)  #1
-        error_label = Label(window, text="You must currently be in a game to use this command,\nagent select does not count!", font=("Orbitron", 15), fg="black", bg=PURPLE)
+        error_label = Label(window, text="You must currently be in a game to use this command,\nagent select does not count!", font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
         current_menu.append(error_label)
         loading_sublabel.destroy()
         loading_label.destroy()
@@ -382,7 +381,7 @@ def displayMatchStats():
                 displayData['redRRs'] += output['redTeam'][i]['rr'] + "\n\n"
                 displayData['redPeaks'] += output['redTeam'][i]['peak'] + "\n\n"
                 displayData['redPeakSeasons'] += output['redTeam'][i]['peakSeason'] + "\n\n"
-            title_label = Label(window, text="Match Stats", font=("Orbitron", 25), fg="black", bg=PURPLE)
+            title_label = Label(window, text="Match Stats", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
             current_menu.append(title_label)  # 0
             back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, command=submitCommand)
             current_menu.append(back_button)  # 1
@@ -390,17 +389,17 @@ def displayMatchStats():
             current_menu.append(next_button)  # 2
             prev_button = Button(window, cursor="hand2", text="<--", font=("Orbitron", 25), bg=PURPLE, command=nextTeam)
             current_menu.append(prev_button)  # 3
-            team_label = Label(window, text=displayData['currentTeam']+" Team", font=("Orbitron", 20), fg="black", bg=PURPLE)
+            team_label = Label(window, text=displayData['currentTeam']+" Team", font=("Orbitron", 20), fg=BLACK, bg=PURPLE)
             current_menu.append(team_label) # 4
-            names_label = Label(window, text=displayData['blueNames'], font=("Orbitron", 15), fg="black", bg=PURPLE)
+            names_label = Label(window, text=displayData['blueNames'], font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
             current_menu.append(names_label) # 5
-            ranks_label = Label(window, text=displayData['blueRanks'], font=("Orbitron", 15), fg="black", bg=PURPLE)
+            ranks_label = Label(window, text=displayData['blueRanks'], font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
             current_menu.append(ranks_label)  # 6
-            rrs_label = Label(window, text=displayData['blueRRs'], font=("Orbitron", 15), fg="black", bg=PURPLE)
+            rrs_label = Label(window, text=displayData['blueRRs'], font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
             current_menu.append(rrs_label)  # 7
-            peaks_label = Label(window, text=displayData['bluePeaks'], font=("Orbitron", 15), fg="black", bg=PURPLE)
+            peaks_label = Label(window, text=displayData['bluePeaks'], font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
             current_menu.append(peaks_label)  # 8
-            peakSeasons_label = Label(window, text=displayData['bluePeakSeasons'], font=("Orbitron", 15), fg="black", bg=PURPLE)
+            peakSeasons_label = Label(window, text=displayData['bluePeakSeasons'], font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
             current_menu.append(peakSeasons_label)  # 9
             back_button.place(x=10, y=15)
             title_label.pack(pady=5)
@@ -435,11 +434,11 @@ def displayMatchStats():
             bottom_frame.grid(row=1, column=0, pady=5, sticky='s')
             current_menu.append(top_frame)
             current_menu.append(bottom_frame)
-            title_label = Label(top_frame, text="Match Stats", font=("Orbitron", 25), fg="black", bg=PURPLE)
+            title_label = Label(top_frame, text="Match Stats", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
             title_label.grid(row=0, column=1, padx=250)
             back_button = Button(top_frame, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, command=submitCommand)
             back_button.grid(row=0, column=0, padx=5)
-            team_label = Label(top_frame, text="FFA", font=("Orbitron", 20), fg="black", bg=PURPLE)
+            team_label = Label(top_frame, text="FFA", font=("Orbitron", 20), fg=BLACK, bg=PURPLE)
             team_label.grid(row=1, column=1, pady=5)
             canvas = Canvas(bottom_frame, height=365, width=885, bg=PURPLE, highlightthickness=0)
             canvas.grid(row=0, column=0)
@@ -449,21 +448,21 @@ def displayMatchStats():
             canvas.bind('<Configure>', lambda e: canvas.configure(scrollregion=canvas.bbox('all')))
             display_frame = Frame(canvas, bg=PURPLE)
             canvas.create_window((0, 0), window=display_frame, anchor='n')
-            names_label = Label(display_frame, text=displayData['names'], font=("Orbitron", 15), fg="black", bg=PURPLE)
+            names_label = Label(display_frame, text=displayData['names'], font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
             names_label.grid(row=0, column=0, padx=25)
-            ranks_label = Label(display_frame, text=displayData['ranks'], font=("Orbitron", 15), fg="black", bg=PURPLE)
+            ranks_label = Label(display_frame, text=displayData['ranks'], font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
             ranks_label.grid(row=0, column=1, padx=25)
-            rrs_label = Label(display_frame, text=displayData['RRs'], font=("Orbitron", 15), fg="black", bg=PURPLE)
+            rrs_label = Label(display_frame, text=displayData['RRs'], font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
             rrs_label.grid(row=0, column=2, padx=25)
-            peaks_label = Label(display_frame, text=displayData['peaks'], font=("Orbitron", 15), fg="black", bg=PURPLE)
+            peaks_label = Label(display_frame, text=displayData['peaks'], font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
             peaks_label.grid(row=0, column=3, padx=25)
-            peakSeasons_label = Label(display_frame, text=displayData['peakSeasons'], font=("Orbitron", 15), fg="black", bg=PURPLE)
+            peakSeasons_label = Label(display_frame, text=displayData['peakSeasons'], font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
             peakSeasons_label.grid(row=0, column=4, padx=25)
 
 
 def displayMatchSkins():
     util.internet()
-    title_label = Label(window, text="Match skins is still under development!", font=("Orbitron", 25), fg="black", bg=PURPLE)
+    title_label = Label(window, text="Match skins is still under development!", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
     current_menu.append(title_label)  #0
     back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, command=submitCommand)
     current_menu.append(back_button)  # 1
@@ -472,32 +471,75 @@ def displayMatchSkins():
 
 
 def displayLogout():
-    temp = {"username": "", "password": "", "region": "", "mfa": "", "token": "", "entitlement": "", "puuid": "", "expiry": ""}
-    f = open('config.json', 'w')
-    dump(temp, f)
+    global region_buttons
+    global logins
+    global logins_check
+    logins['username'] = ""
+    logins['password'] = ""
+    logins['region'] = ""
+    logins['token'] = ""
+    logins['entitlement'] = ""
+    logins['puuid'] = ""
+    logins['mfa'] = ""
+    logins['expiry'] = ""
+    f = open("config.json", "w")
+    dump(logins, f)
     f.close()
-    title_label = Label(window, text="Logout", font=("Orbitron", 25), fg="black", bg=PURPLE)
-    current_menu.append(title_label)  #0
-    subtitle_label = Label(window, text="Successfully logged out!\nRestart application to log in again.", font=("Orbitron", 20), fg="black", bg=PURPLE)
-    current_menu.append(subtitle_label) #1
-    title_label.pack(pady=5)
-    subtitle_label.pack()
+    window.bind("<Return>", login)
+    logins_check = checkLogins()
+    region_buttons = [0, 0, 0, 0]
+    displayLogin()
+    region_buttons[0] = Button(window, cursor="hand2", text="NA", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, command=lambda num=0: selectRegion(num))
+    region_buttons[1] = Button(window, cursor="hand2", text="EU", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, command=lambda num=1: selectRegion(num))
+    region_buttons[2] = Button(window, cursor="hand2", text="AP", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, command=lambda num=2: selectRegion(num))
+    region_buttons[3] = Button(window, cursor="hand2", text="KR", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, command=lambda num=3: selectRegion(num))
+    region_buttons[0].place(x=170, y=300)
+    region_buttons[1].place(x=320, y=300)
+    region_buttons[2].place(x=470, y=300)
+    region_buttons[3].place(x=620, y=300)
 
 
 def displayHelp():
-    title_label = Label(window, text="Help", font=("Orbitron", 25), fg="black", bg=PURPLE)
+    title_label = Label(window, text="Help", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
     current_menu.append(title_label)  #0
     back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, command=submitCommand)
     current_menu.append(back_button)  # 1
-    bug_label = Label(window, text="Found a bug? Contact the dev with one of the following:\nDiscord: tiddybite#6304\nEmail: sadiq.shahid101@gmail.com\n ", font=("Orbitron", 15), fg="black", bg=PURPLE)
+    bug_label = Label(window, text="Found a bug? Contact the dev with one of the following:\nDiscord: tiddybite#6304\nEmail: sadiq.shahid101@gmail.com\n ", font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
     current_menu.append(bug_label) #2
-    donate_label = Label(window, text="\nDonations are not needed but always appreciated!\nClick here to donate", font=("Orbitron", 15), fg="black", bg=PURPLE, cursor="hand2")
+    donate_label = Label(window, text="\nDonations are not needed but always appreciated!\nClick here to donate", font=("Orbitron", 15), fg=BLACK, bg=PURPLE, cursor="hand2")
     current_menu.append(donate_label)  # 3
     donate_label.bind("<Button-1>", lambda e: hyperlink('https://ko-fi.com/spherical'))
     back_button.place(x=10, y=15)
     title_label.pack(pady=5)
     bug_label.pack()
     donate_label.pack(pady=5)
+
+
+def displayLogin():
+    title_label = Label(window, text="Please log in:", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
+    current_menu.append(title_label) #0
+    username_label = Label(window, text="Username:", font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
+    current_menu.append(username_label) #1
+    username_input = Entry(window, font=("Orbitron", 25), fg=BLACK, bg="white", width=15)
+    current_menu.append(username_input) #2
+    password_label = Label(window, text="Password:", font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
+    current_menu.append(password_label) #3
+    password_input = Entry(window, font=("Orbitron", 25), fg=BLACK, bg="white", width=15, show="*")
+    current_menu.append(password_input) #4
+    enter_button = Button(window, cursor="hand2", text="Enter", command=lambda self=window: login(self), font=("Orbitron", 20), bg=PURPLE)
+    current_menu.append(enter_button) #5
+    region_label = Label(window, text="Select a region:", font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
+    current_menu.append(region_label) #6
+    error_label = Label(window, text="", bg=PURPLE, fg="red", font=("Orbitron", 15))
+    current_menu.append(error_label) #7
+    title_label.pack()
+    username_label.place(x=10, y=75)
+    username_input.place(x=10, y=100)
+    password_label.place(x=450, y=75)
+    password_input.place(x=450, y=100)
+    enter_button.pack(side="bottom", pady=5)
+    region_label.place(x=350, y=200)
+    error_label.pack(side="bottom", pady=10)
 
 
 def nextSkin(store):
@@ -544,6 +586,7 @@ def nextTeam():
 # updates the colour of the region buttons depending on which one is selected
 def selectRegion(regionNum):
     global region
+    global region_buttons
     for i in range(4):
         if i == regionNum:
             region_buttons[i]['bg'] = "green"
@@ -562,17 +605,19 @@ def selectRegion(regionNum):
 # sends api call to log in, then writes it into config.json
 def login(self):
     global region
+    global logins
+    global logins_check
     logging.info('made it into login()')
-    error_label['text'] = "Checking logins, please wait!"
+    current_menu[7]['text'] = "Checking logins, please wait!"
     window.update()
-    username = username_input.get()
-    password = password_input.get()
+    username = current_menu[2].get()
+    password = current_menu[4].get()
     if username == "" or password == "" or region == "":
-        error_label['text'] = "Missing fields!"
+        current_menu[7]['text'] = "Missing fields!"
     else:
         authorization = getAuth(username, password)
         if authorization[0] == "-1":
-            error_label['text'] = "Invalid logins!"
+            current_menu[7]['text'] = "Invalid logins!"
         else:
             logins['username'] = encrypt(username, enc_key)
             logins['password'] = encrypt(password, enc_key)
@@ -594,14 +639,25 @@ def login(self):
             f = open("config.json", "w")
             dump(logins, f)
             f.close()
-            error_label['text'] = "Successfully logged in! Restart application to apply changes."
-            enter_button['state'] = DISABLED
+            for i in current_menu:
+                i.destroy()
+            for i in region_buttons:
+                i.destroy()
+            region_buttons.clear()
+            current_menu.clear()
+            displayMainMenu()
+            f = open("config.json", 'r')
+            logins = load(f)
+            f.close()
+            logins_check = [0, authorization[0], authorization[1], authorization[2], authorization[3]]
+            window.bind('<Return>', lambda event: submitCommand())
 
 
 try: # Put it all in a try... except to catch all errors and log them
     ### INITIALIZING IMPORTANT VARIABLES ###
-    PURPLE = "#400080"
-    current_version = "1.0.2"
+    PURPLE = environ['PURPLE']
+    BLACK = environ['BLACK']
+    current_version = "1.0.3"
     region = ""
     enc_key = "0"
     logins = {}
@@ -614,6 +670,7 @@ try: # Put it all in a try... except to catch all errors and log them
     current_menu = []
     current_skin = 0
     displayData = {}
+    region_buttons = [0, 0, 0, 0]
     log_dir = ""
     logging.basicConfig(filename=(log_dir + "logs.txt"), level=logging.DEBUG, format='%(message)s')
     f = open('logs.txt', 'w')
@@ -631,7 +688,7 @@ try: # Put it all in a try... except to catch all errors and log them
     window.iconphoto(True, icon)
     window.config(background=PURPLE)
     window.resizable(False, False)
-    check_logins_label = Label(window, text="Checking logins... Please wait\n(may take up to 15 seconds)", font=('Orbitron', 25), fg="black", bg=PURPLE)
+    check_logins_label = Label(window, text="Checking logins... Please wait\n(may take up to 15 seconds)", font=('Orbitron', 25), fg=BLACK, bg=PURPLE)
     check_logins_label.pack()
     window.update()
     util.internet()
@@ -667,6 +724,7 @@ try: # Put it all in a try... except to catch all errors and log them
         f = open("config.json", 'r')
         logins = load(f)
         f.close()
+        print(logins)
         displayMainMenu()
         window.bind('<Return>', lambda event: submitCommand())
     elif logins_check[0] == 1:
@@ -683,31 +741,15 @@ try: # Put it all in a try... except to catch all errors and log them
         dump(logins, f)
         f.close()
         window.bind("<Return>", login)
-        title_label = Label(window, text="Please log in:", font=("Orbitron", 25), fg="black", bg=PURPLE)
-        username_label = Label(window, text="Username:", font=("Orbitron", 15), fg="black", bg=PURPLE)
-        username_input = Entry(window, font=("Orbitron", 25), fg="black", bg="white", width=15)
-        password_label = Label(window, text="Password:", font=("Orbitron", 15), fg="black", bg=PURPLE)
-        password_input = Entry(window, font=("Orbitron", 25), fg="black", bg="white", width=15, show="*")
-        enter_button = Button(window, cursor="hand2", text="Enter", command=lambda self=window: login(self), font=("Orbitron", 20), bg=PURPLE)
-        region_label = Label(window, text="Select a region:", font=("Orbitron", 15), fg="black", bg=PURPLE)
-        region_buttons = [0, 0, 0, 0]
-        region_buttons[0] = Button(window, cursor="hand2", text="NA", font=("Orbitron", 20), fg="black", bg=PURPLE, command=lambda num=0: selectRegion(num))
-        region_buttons[1] = Button(window, cursor="hand2", text="EU", font=("Orbitron", 20), fg="black", bg=PURPLE, command=lambda num=1: selectRegion(num))
-        region_buttons[2] = Button(window, cursor="hand2", text="AP", font=("Orbitron", 20), fg="black", bg=PURPLE, command=lambda num=2: selectRegion(num))
-        region_buttons[3] = Button(window, cursor="hand2", text="KR", font=("Orbitron", 20), fg="black", bg=PURPLE, command=lambda num=3: selectRegion(num))
-        error_label = Label(window, text="", bg=PURPLE, fg="red", font=("Orbitron", 15))
-        title_label.pack()
-        username_label.place(x=10, y=75)
-        username_input.place(x=10, y=100)
-        password_label.place(x=450, y=75)
-        password_input.place(x=450, y=100)
-        enter_button.pack(side="bottom", pady=5)
-        region_label.place(x=350, y=200)
+        displayLogin()
+        region_buttons[0] = Button(window, cursor="hand2", text="NA", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, command=lambda num=0: selectRegion(num))
+        region_buttons[1] = Button(window, cursor="hand2", text="EU", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, command=lambda num=1: selectRegion(num))
+        region_buttons[2] = Button(window, cursor="hand2", text="AP", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, command=lambda num=2: selectRegion(num))
+        region_buttons[3] = Button(window, cursor="hand2", text="KR", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, command=lambda num=3: selectRegion(num))
         region_buttons[0].place(x=170, y=300)
         region_buttons[1].place(x=320, y=300)
         region_buttons[2].place(x=470, y=300)
         region_buttons[3].place(x=620, y=300)
-        error_label.pack(side="bottom", pady=10)
 
     mainloop()
 except Exception as e:
