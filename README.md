@@ -24,6 +24,11 @@ Current stats available include:
 # Current issues/bugs that will be fixed in the next update(s)
 * logged in as "false" after first log in
 
+# Upcoming features
+* Color customization
+* Match skins command
+* Multi login
+
 
 # Credits and support
 
