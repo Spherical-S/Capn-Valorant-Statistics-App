@@ -655,8 +655,8 @@ def login(self):
 
 try: # Put it all in a try... except to catch all errors and log them
     ### INITIALIZING IMPORTANT VARIABLES ###
-    PURPLE = environ['PURPLE']
-    BLACK = environ['BLACK']
+    PURPLE = '#400080'
+    BLACK = '#000000'
     current_version = "1.0.3"
     region = ""
     enc_key = "0"
