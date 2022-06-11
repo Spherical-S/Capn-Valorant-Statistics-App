@@ -22,8 +22,7 @@ Current stats available include:
  
 
 # Current issues/bugs that will be fixed in the next update(s)
-* Authentication does not work, app crashes
-* logged in as "false" after first log in
+* No known bugs need fixing currently, if you notice a bug, please contact the developer on discord (tiddybite#6304)
 
 # Upcoming features
 * Color customization
