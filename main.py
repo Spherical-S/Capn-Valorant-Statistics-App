@@ -200,6 +200,7 @@ def submitCommand():
 # next 6 definition display the specified commands gui
 def displayMainMenu():
     global main_menu
+    window.bind('<Return>', lambda event: submitCommand())
     main_menu.clear()
     title_label = Label(window, text="Aye Aye Capn!", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
     main_menu.append(title_label) #0
@@ -221,7 +222,7 @@ def displayMainMenu():
     main_menu.append(help_button)  # 8
     created_by = Label(window, text="Created by Spherical-S on github", font=("Orbitron", 12), fg=BLACK, bg=PURPLE)
     main_menu.append(created_by) # 9
-    logged_in_as = Label(window, text=f"Logged in as {decrypt(logins['username'], environ.get('CAPNKEY'))}", font=("Orbitron", 12), fg=BLACK, bg=PURPLE)
+    logged_in_as = Label(window, text=f"Logged in as {decrypt(logins['username'], enc_key)}", font=("Orbitron", 12), fg=BLACK, bg=PURPLE)
     main_menu.append(logged_in_as) # 10
     title_label.place(x=311, y=5)
     rank_button.place(x=70, y=85)
@@ -237,6 +238,7 @@ def displayMainMenu():
 
 
 def displayRankMenu(player, tag, region, act):
+    window.unbind('<Return>')
     util.internet()
     loading_label = Label(window, text="Loading...", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
     loading_label.pack()
@@ -279,6 +281,7 @@ def displayRankMenu(player, tag, region, act):
 
 def displayStore():
     global current_skin
+    window.unbind('<Return>')
     util.internet()
     loading_label = Label(window, text="Loading...", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
     loading_label.pack()
@@ -328,6 +331,7 @@ def displayStore():
 
 def displayMatchStats():
     global displayData
+    window.unbind('<Return>')
     util.internet()
     loading_label = Label(window, text="Loading...", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
     loading_label.pack()
@@ -461,6 +465,7 @@ def displayMatchStats():
 
 
 def displayMatchSkins():
+    window.unbind('<Return>')
     util.internet()
     title_label = Label(window, text="Match skins is still under development!", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
     current_menu.append(title_label)  #0
@@ -474,6 +479,7 @@ def displayLogout():
     global region_buttons
     global logins
     global logins_check
+    window.unbind('<Return>')
     logins['username'] = ""
     logins['password'] = ""
     logins['region'] = ""
@@ -500,6 +506,7 @@ def displayLogout():
 
 
 def displayHelp():
+    window.unbind('<Return>')
     title_label = Label(window, text="Help", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
     current_menu.append(title_label)  #0
     back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, command=submitCommand)
@@ -516,6 +523,7 @@ def displayHelp():
 
 
 def displayLogin():
+    window.bind("<Return>", login)
     title_label = Label(window, text="Please log in:", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
     current_menu.append(title_label) #0
     username_label = Label(window, text="Username:", font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
@@ -629,8 +637,8 @@ def login(self):
             logins['expiry'] = ""
             if authorization[3] == "1":
                 logins['mfa'] = "1"
-                logins['token'] = encrypt(authorization[0], environ.get('CAPNKEY'))
-                logins['entitlement'] = encrypt(authorization[1], environ.get('CAPNKEY'))
+                logins['token'] = encrypt(authorization[0], enc_key)
+                logins['entitlement'] = encrypt(authorization[1], enc_key)
                 logins['puuid'] = authorization[2]
                 now = datetime.now()
                 exp = int(now.strftime("%Y%m%d%H%M%S"))
@@ -645,19 +653,18 @@ def login(self):
                 i.destroy()
             region_buttons.clear()
             current_menu.clear()
-            displayMainMenu()
             f = open("config.json", 'r')
             logins = load(f)
             f.close()
+            displayMainMenu()
             logins_check = [0, authorization[0], authorization[1], authorization[2], authorization[3]]
-            window.bind('<Return>', lambda event: submitCommand())
 
 
 try: # Put it all in a try... except to catch all errors and log them
     ### INITIALIZING IMPORTANT VARIABLES ###
     PURPLE = '#400080'
     BLACK = '#000000'
-    current_version = "1.0.3"
+    current_version = "1.0.4"
     region = ""
     enc_key = "0"
     logins = {}
@@ -725,7 +732,6 @@ try: # Put it all in a try... except to catch all errors and log them
         logins = load(f)
         f.close()
         displayMainMenu()
-        window.bind('<Return>', lambda event: submitCommand())
     elif logins_check[0] == 1:
         check_logins_label.destroy()
         logins['username'] = ""

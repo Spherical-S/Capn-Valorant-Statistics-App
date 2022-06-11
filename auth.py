@@ -1,6 +1,9 @@
 from requests import session as sesh
+from requests.adapters import HTTPAdapter
+import ssl
 from tkinter import *
 from collections import OrderedDict
+from typing import Any
 from re import compile
 from json import load
 from time import sleep
@@ -9,6 +12,13 @@ from cryptocode import decrypt
 from datetime import datetime
 from dotenv import load_dotenv
 load_dotenv()
+
+class TLSAdapter(HTTPAdapter):
+    def init_poolmanager(self, *args: Any, **kwargs: Any) -> None:
+        ctx = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
+        ctx.set_ciphers('DEFAULT@SECLEVEL=1')
+        kwargs['ssl_context'] = ctx
+        return super(TLSAdapter, self).init_poolmanager(*args, **kwargs)
 
 def checkLogins(): #Checks if user is logged in, if they are check if the logins are valid or ask for 2fa code
     global logins
@@ -44,15 +54,22 @@ def checkLogins(): #Checks if user is logged in, if they are check if the logins
 
 def getAuth(username, password):
     headers = OrderedDict({
-        'User-Agent': 'RiotClient/43.0.1.4195386.4190634 rso-auth (Windows;10;;Professional, x64)'
+        "Accept-Language": "en-US,en;q=0.9",
+        "Accept": "application/json, text/plain, */*"
     })
     session = sesh()
     session.headers = headers
+    session.mount('https://', TLSAdapter())
     data = {
-        'client_id': 'play-valorant-web-prod',
-        'nonce': '1',
-        'redirect_uri': 'https://playvalorant.com/opt_in',
-        'response_type': 'token id_token',
+        "client_id": "play-valorant-web-prod",
+        "nonce": "1",
+        "redirect_uri": "https://playvalorant.com/opt_in",
+        "response_type": "token id_token",
+        'scope': 'account openid',
+    }
+    headers = {
+        'Content-Type': 'application/json',
+        'User-Agent': 'RiotClient/51.0.0.4429735.4381201 rso-auth (Windows;10;;Professional, x64)',
     }
     r = session.post(f'https://auth.riotgames.com/api/v1/authorization', json=data, headers=headers)
     data = {
@@ -92,20 +109,11 @@ def getAuth(username, password):
     token = data[0]
 
     headers = {
-        'Accept-Encoding': 'gzip, deflate, br',
-        'Host': "entitlements.auth.riotgames.com",
-        'User-Agent': 'RiotClient/43.0.1.4195386.4190634 rso-auth (Windows;10;;Professional, x64)',
+        'User-Agent': 'RiotClient/51.0.0.4429735.4381201 rso-auth (Windows;10;;Professional, x64)',
         'Authorization': f'Bearer {token}',
     }
     r = session.post('https://entitlements.auth.riotgames.com/api/token/v1', headers=headers, json={})
     entitlement = r.json()['entitlements_token']
-
-    headers = {
-        'Accept-Encoding': 'gzip, deflate, br',
-        'Host': "auth.riotgames.com",
-        'User-Agent': 'RiotClient/43.0.1.4195386.4190634 rso-auth (Windows;10;;Professional, x64)',
-        'Authorization': f'Bearer {token}',
-    }
 
     r = session.post('https://auth.riotgames.com/userinfo', headers=headers, json={})
     data = r.json()
