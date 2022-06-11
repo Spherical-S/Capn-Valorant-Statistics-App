@@ -22,6 +22,7 @@ Current stats available include:
  
 
 # Current issues/bugs that will be fixed in the next update(s)
+* Authentication does not work, app crashes
 * logged in as "false" after first log in
 
 # Upcoming features
