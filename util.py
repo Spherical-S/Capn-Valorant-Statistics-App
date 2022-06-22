@@ -7,11 +7,14 @@ from math import ceil
 from http.client import HTTPSConnection
 from string import ascii_lowercase
 from random import choice
+from threading import Thread, Lock
 
 clientPlatform = "ew0KCSJwbGF0Zm9ybVR5cGUiOiAiUEMiLA0KCSJwbGF0Zm9ybU9TIjogIldpbmRvd3MiLA0KCSJwbGF0Zm9ybU9TVmVyc2lvbiI6ICIxMC4wLjE5MDQyLjEuMjU2LjY0Yml0IiwNCgkicGxhdGZvcm1DaGlwc2V0IjogIlVua25vd24iDQp9"
 acts = {}
 agents = {}
 weaponsDictionary = {}
+mStatsOutput = []
+lock = Lock()
 
 
 def internet():
@@ -104,7 +107,7 @@ def getCurrentSeason():
             seEnd = i['endTime'][0:indexOf(i['endTime'], 'T')]
             seStart = seStart[0:4] + seStart[5:7] + seStart[8:10]
             seEnd = seEnd[0:4] + seEnd[5:7] + seEnd[8:10]
-            if currentDate >= int(seStart) and currentDate < int(seEnd):
+            if currentDate >= int(seStart) and currentDate <= int(seEnd):
                 if (count - 1) % 4 == 1:
                     return f'E{episode}A1'
                 if (count - 1) % 4 == 2:
@@ -293,15 +296,26 @@ def getBalance(t, en, puuid, region):
         return ["Error", "Error"]
 
 
+def playerStats(i, region, en, t, y, team, agentsDictionary):
+    global mStatsOutput
+    rankData = getMatchRanks(region, en, t, y['Players'][i]['Subject'])
+    nameFromPUUID = getNameFromPUUID(y['Players'][i]['Subject'], region, t)
+    name = nameFromPUUID[0]
+    lock.acquire()
+    mStatsOutput[team].append({'puuid': y['Players'][i]['Subject'], 'name': name, 'agent': agentsDictionary[y['Players'][i]['CharacterID']], 'rank': rankData[0], 'rr': rankData[1], 'peak': rankData[2], 'peakSeason': rankData[3]})
+    lock.release()
+
+
 # Gets users match stats
 def matchStats(t, en, puuid, region):
+    global mStatsOutput
     agentsDictionary = getAgents()
     matchID = getCurrentMatchID(t, en, puuid, region)
     if matchID != "-1":
         matchid = matchID
     else:
-        output = {'status': -1}
-        return output
+        mStatsOutput = {'status': -1}
+        return mStatsOutput
     url = f'https://glz-{region}-1.{region}.a.pvp.net/core-game/v1/matches/{matchid}'
     headers = {
         'X-Riot-Entitlements-JWT': en,
@@ -309,42 +323,45 @@ def matchStats(t, en, puuid, region):
     }
     r = get(url, headers=headers)
     if str(r.status_code) != "200":
-        output = {'status': -1}
-        return output
+        mStatsOutput = {'status': -1}
+        return mStatsOutput
     y = r.json()
     players = y['Players']
     ffa = False
     if y['ModeID'] == '/Game/GameModes/Deathmatch/DeathmatchGameMode.DeathmatchGameMode_C':
         ffa = True
     if ffa == False:
-        output = {}
-        output['status'] = 200
-        output['ffa'] = 0
-        output['blueTeam'] = []
-        output['redTeam'] = []
+        mStatsOutput = {}
+        mStatsOutput['status'] = 200
+        mStatsOutput['ffa'] = 0
+        mStatsOutput['blueTeam'] = []
+        mStatsOutput['redTeam'] = []
+        threads = []
         for i in range(len(players)):
             if y['Players'][i]['TeamID'] == "Blue":
-                rankData = getMatchRanks(region, en, t, y['Players'][i]['Subject'])
-                nameFromPUUID = getNameFromPUUID(y['Players'][i]['Subject'], region, t)
-                name = nameFromPUUID[0]
-                output['blueTeam'].append({'puuid': y['Players'][i]['Subject'], 'name': name, 'agent': agentsDictionary[y['Players'][i]['CharacterID']], 'rank': rankData[0], 'rr': rankData[1], 'peak': rankData[2], 'peakSeason': rankData[3]})
+                temp = Thread(target=playerStats, args=(i, region, en, t, y, "blueTeam", agentsDictionary,))
+                temp.start()
+                threads.append(temp)
             else:
-                rankData = getMatchRanks(region, en, t, y['Players'][i]['Subject'])
-                nameFromPUUID = getNameFromPUUID(y['Players'][i]['Subject'], region, t)
-                name = nameFromPUUID[0]
-                output['redTeam'].append({'puuid': y['Players'][i]['Subject'], 'name': name, 'agent': agentsDictionary[y['Players'][i]['CharacterID']], 'rank': rankData[0], 'rr': rankData[1], 'peak': rankData[2], 'peakSeason': rankData[3]})
-        return output
-    else:
-        output = {}
-        output['status'] = 200
-        output['ffa'] = 1
-        output['players'] = []
+                temp = Thread(target=playerStats, args=(i, region, en, t, y, "redTeam", agentsDictionary,))
+                temp.start()
+                threads.append(temp)
         for i in range(len(players)):
-            rankData = getMatchRanks(region, en, t, y['Players'][i]['Subject'])
-            nameFromPUUID = getNameFromPUUID(y['Players'][i]['Subject'], region, t)
-            name = nameFromPUUID[0]
-            output['players'].append({'puuid': y['Players'][i]['Subject'], 'name': name, 'agent': agentsDictionary[y['Players'][i]['CharacterID']], 'rank': rankData[0], 'rr': rankData[1], 'peak': rankData[2], 'peakSeason': rankData[3]})
-        return output
+            threads[i].join()
+        return mStatsOutput
+    else:
+        mStatsOutput = {}
+        mStatsOutput['status'] = 200
+        mStatsOutput['ffa'] = 1
+        mStatsOutput['players'] = []
+        threads = []
+        for i in range(len(players)):
+            temp = Thread(target=playerStats, args=(i, region, en, t, y, "players", agentsDictionary,))
+            temp.start()
+            threads.append(temp)
+        for i in range(len(players)):
+            threads[i].join()
+        return mStatsOutput
 
 
 

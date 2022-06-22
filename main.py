@@ -664,7 +664,7 @@ try: # Put it all in a try... except to catch all errors and log them
     ### INITIALIZING IMPORTANT VARIABLES ###
     PURPLE = '#400080'
     BLACK = '#000000'
-    current_version = "1.0.5"
+    current_version = "1.0.6"
     region = ""
     enc_key = "0"
     logins = {}
