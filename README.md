@@ -28,7 +28,6 @@ Current stats available include:
 * Color customization
 * Match skins command
 * Multi login
-* Make match stats faster
 
 
 # Credits and support
