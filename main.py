@@ -31,9 +31,10 @@ def updateSelectedCommand(cmd):
     global selected_command
     global main_menu
     selected_command = cmd
+    darker = util.colorDarken(PURPLE)
     # Gets the UI ready for rank command
     if cmd == 1:
-        main_menu[1]['bg'] = '#340066'
+        main_menu[1]['bg'] = darker
         main_menu[2]['bg'] = PURPLE
         main_menu[3]['bg'] = PURPLE
         main_menu[4]['bg'] = PURPLE
@@ -73,7 +74,7 @@ def updateSelectedCommand(cmd):
         args_list[6].place(x=495, y=341)
         args_list[7].place(x=590, y=341)
     if cmd == 2:
-        main_menu[2]['bg'] = '#340066'
+        main_menu[2]['bg'] = darker
         main_menu[1]['bg'] = PURPLE
         main_menu[3]['bg'] = PURPLE
         main_menu[4]['bg'] = PURPLE
@@ -82,7 +83,7 @@ def updateSelectedCommand(cmd):
         resetArguments()
         args_list.clear()
     if cmd == 3:
-        main_menu[3]['bg'] = '#340066'
+        main_menu[3]['bg'] = darker
         main_menu[2]['bg'] = PURPLE
         main_menu[1]['bg'] = PURPLE
         main_menu[4]['bg'] = PURPLE
@@ -91,7 +92,7 @@ def updateSelectedCommand(cmd):
         resetArguments()
         args_list.clear()
     if cmd == 4:
-        main_menu[4]['bg'] = '#340066'
+        main_menu[4]['bg'] = darker
         main_menu[2]['bg'] = PURPLE
         main_menu[3]['bg'] = PURPLE
         main_menu[1]['bg'] = PURPLE
@@ -101,7 +102,7 @@ def updateSelectedCommand(cmd):
         args_list.clear()
         main_menu[7]['text'] = "Match skins command is still in development!"
     if cmd == 5:
-        main_menu[5]['bg'] = '#340066'
+        main_menu[5]['bg'] = darker
         main_menu[2]['bg'] = PURPLE
         main_menu[3]['bg'] = PURPLE
         main_menu[4]['bg'] = PURPLE
@@ -110,7 +111,7 @@ def updateSelectedCommand(cmd):
         resetArguments()
         args_list.clear()
     if cmd == 6:
-        main_menu[8]['bg'] = '#340066'
+        main_menu[8]['bg'] = darker
         main_menu[2]['bg'] = PURPLE
         main_menu[3]['bg'] = PURPLE
         main_menu[4]['bg'] = PURPLE
@@ -204,21 +205,21 @@ def displayMainMenu():
     main_menu.clear()
     title_label = Label(window, text="Aye Aye Capn!", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
     main_menu.append(title_label) #0
-    rank_button = Button(window, cursor="hand2", text="Rank", font=("Orbitron", 20), bg=PURPLE, width=10, command=lambda: updateSelectedCommand(1))
+    rank_button = Button(window, cursor="hand2", text="Rank", font=("Orbitron", 20), bg=PURPLE, fg=BLACK, width=10, command=lambda: updateSelectedCommand(1))
     main_menu.append(rank_button) #1
-    store_button = Button(window, cursor="hand2", text="Store", font=("Orbitron", 20), bg=PURPLE, width=10, command=lambda: updateSelectedCommand(2))
+    store_button = Button(window, cursor="hand2", text="Store", font=("Orbitron", 20), bg=PURPLE, fg=BLACK, width=10, command=lambda: updateSelectedCommand(2))
     main_menu.append(store_button) #2
-    match_stats_button = Button(window, cursor="hand2", text="Match Stats", font=("Orbitron", 20), bg=PURPLE, width=10, command=lambda: updateSelectedCommand(3))
+    match_stats_button = Button(window, cursor="hand2", text="Match Stats", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, width=10, command=lambda: updateSelectedCommand(3))
     main_menu.append(match_stats_button) #3
-    match_skins_button = Button(window, cursor="hand2", text="Match Skins", font=("Orbitron", 20), bg=PURPLE, width=10, command=lambda: updateSelectedCommand(4))
+    match_skins_button = Button(window, cursor="hand2", text="Match Skins", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, width=10, command=lambda: updateSelectedCommand(4))
     main_menu.append(match_skins_button) #4
-    logout_button = Button(window, cursor="hand2", text="Logout", font=("Orbitron", 20), bg=PURPLE, width=10, command=lambda: updateSelectedCommand(5))
+    logout_button = Button(window, cursor="hand2", text="Logout", font=("Orbitron", 20), bg=PURPLE, fg=BLACK, width=10, command=lambda: updateSelectedCommand(5))
     main_menu.append(logout_button) #5
-    submit_button = Button(window, cursor="hand2", text="Submit", font=("Orbitron", 20), bg=PURPLE, width=5, command=submitCommand)
+    submit_button = Button(window, cursor="hand2", text="Submit", font=("Orbitron", 20), bg=PURPLE, fg=BLACK, width=5, command=submitCommand)
     main_menu.append(submit_button) #6
     error_label = Label(window, text="", bg=PURPLE, fg="red", font=("Orbitron", 15))
     main_menu.append(error_label) #7
-    help_button = Button(window, cursor="hand2", text="Help", font=("Orbitron", 20), bg=PURPLE, width=10, command=lambda: updateSelectedCommand(6))
+    help_button = Button(window, cursor="hand2", text="Help", font=("Orbitron", 20), bg=PURPLE, fg=BLACK, width=10, command=lambda: updateSelectedCommand(6))
     main_menu.append(help_button)  # 8
     created_by = Label(window, text="Created by Spherical-S on github", font=("Orbitron", 12), fg=BLACK, bg=PURPLE)
     main_menu.append(created_by) # 9
@@ -247,8 +248,12 @@ def displayRankMenu(player, tag, region, act):
     window.update()
     if act == "current":
         act = util.getCurrentSeason()
+    xAct = int(act[1:2]) - 1
     output = util.getRankByName(player, tag, region, act, logins_check[1], logins_check[2])
-    image = Image.open(f"visualcontent\\{str(output[3])}.png")
+    if xAct < 4:
+        image = Image.open(f"visualcontent\\ranksold\\{str(output[3])}.png")
+    else:
+        image = Image.open(f"visualcontent\\ranksnew\\{str(output[3])}.png")
     image = image.resize((200, 200))
     window.img = ImageTk.PhotoImage(image)
     title_label = Label(window, text="Rank", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
@@ -664,7 +669,7 @@ try: # Put it all in a try... except to catch all errors and log them
     ### INITIALIZING IMPORTANT VARIABLES ###
     PURPLE = '#400080'
     BLACK = '#000000'
-    current_version = "1.0.6"
+    current_version = "1.0.7"
     region = ""
     enc_key = "0"
     logins = {}

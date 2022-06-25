@@ -1,7 +1,7 @@
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Y8Y0C2CAM)
 
 # CAPN - Valorant Statistics App
-Version: 1.0.3
+Version: 1.0.7
 
 CAPN - Valorant Statistics is an application designed to help valorant players find out cool statistics easily. All you have to do is download the app, launch it, and get whatever data you need!
 
@@ -28,6 +28,7 @@ Current stats available include:
 * Color customization
 * Match skins command
 * Multi login
+* Match stats working in agents select
 
 
 # Credits and support

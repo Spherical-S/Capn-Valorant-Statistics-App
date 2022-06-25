@@ -36,6 +36,32 @@ def randomString(length):
     return result_str
 
 
+def colorDarken(old_hex):
+    r = int(old_hex[1:3], 16)
+    g = int(old_hex[3:5], 16)
+    b = int(old_hex[5:7], 16)
+    r = r - 40
+    g = g - 40
+    b = b - 40
+    if r < 0:
+        r = 0
+    if g < 0:
+        g = 0
+    if b < 0:
+        b = 0
+    r = hex(r)[2:4]
+    g = hex(g)[2:4]
+    b = hex(b)[2:4]
+    if len(r) == 1:
+        r = f"0{r}"
+    if len(g) == 1:
+        g = f"0{g}"
+    if len(b) == 1:
+        b = f"0{b}"
+    return f"#{r}{g}{b}"
+
+
+
 # Turns a url image into a valid photo image to be displayed in tkinter
 def photoImagify(url):
     img_data = get(url).content
@@ -130,7 +156,7 @@ def getOtherPUUID(name, tagline, region):
     headers = {
         'accept': 'application / json'
     }
-    url = f'https://api.henrikdev.xyz/valorant/v2/mmr/{region.lower()}/{name}/{tagline}'
+    url = f'https://api.henrikdev.xyz/valorant/v1/account/{name}/{tagline}'
     r = get(url, headers=headers)
     y = r.json()
     if r.status_code == 200:
@@ -154,6 +180,7 @@ def getRankByName(name, tag, region, act, t, en):
     # 150: unranked but has had a max rank
     # 200: all data present
     # 100: player has not played ranked in the given act
+    xAct = int(act[1:2]) - 1
     actsDictionary = acts
     puuid = getOtherPUUID(name, tag, region)
     if puuid == "429":
@@ -184,7 +211,7 @@ def getRankByName(name, tag, region, act, t, en):
         output = [429, "Error", "N/A", 0, "Error", 0, "Error", "You have been rate limited, try again in ~2 minutes"]
         return output
     else:
-        maxrank = x['data'][0]['tiers'][maxRank[0]]['tierName']
+        maxrank = x['data'][4]['tiers'][maxRank[0]]['tierName']
         maxSeason = maxRank[1]
         if status != "200":
             output = [-1, "Error", "N/A", 0, "Error", -1, "Error", "Error, please try again later!"]
@@ -193,7 +220,7 @@ def getRankByName(name, tag, region, act, t, en):
             y = r.json()
             try:
                 rankTIER = y["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][actsDictionary[act]]["CompetitiveTier"]
-                rank = x['data'][0]['tiers'][rankTIER]['tierName']
+                rank = x['data'][xAct]['tiers'][rankTIER]['tierName']
                 if rank == 'UNRANKED':
                     output = [150, "UNRANKED", "N/A", rankTIER, maxrank, maxRank[0], maxSeason, ""]
                     return output
@@ -384,6 +411,7 @@ def getCurrentMatchID(t, en, puuid, region):
 # Gets a players max rank for the match stats command
 def getMatchRanks(region, en, t, puuid):
     act = getCurrentSeason()
+    xAct = int(act[1:2]) - 1
     actsDictionary = acts
     url = f'https://pd.{region}.a.pvp.net/mmr/v1/players/{puuid}'
     headers = {
@@ -402,14 +430,14 @@ def getMatchRanks(region, en, t, puuid):
         return rank
     elif maxRank[0] == 429:
         rank = ["Rate Limit", "N/A", "Rate Limit", "E0A0"]
-    maxrank = x['data'][0]['tiers'][maxRank[0]]['tierName']
+    maxrank = x['data'][xAct]['tiers'][maxRank[0]]['tierName']
     maxSeason = maxRank[1]
     if status != "200":
         return ["Rate Limit", "N/A", "Rate Limit", "E0A0"]
     y = r.json()
     try:
         rankTIER = y["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][actsDictionary[act]]["CompetitiveTier"]
-        rank = x['data'][0]['tiers'][rankTIER]['tierName']
+        rank = x['data'][xAct]['tiers'][rankTIER]['tierName']
         if rank == 'UNRANKED':
             output = ['UNRANKED', 'N/A', maxrank, maxSeason]
             return output
