@@ -22,7 +22,7 @@ Current stats available include:
  
 
 # Current issues/bugs that will be fixed in the next update(s)
-* No known bugs need fixing currently, if you notice a bug, please contact the developer on discord (tiddybite#6304)
+* Sometimes it will say someone peaked ascendent in an act where the rank was not even out
 
 # Upcoming features
 * Color customization
