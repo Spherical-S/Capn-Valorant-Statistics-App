@@ -1,9 +1,11 @@
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Y8Y0C2CAM)
 
 # CAPN - Valorant Statistics App
-Version: 1.0.7
+Version: 1.0.8
 
 CAPN - Valorant Statistics is an application designed to help valorant players find out cool statistics easily. All you have to do is download the app, launch it, and get whatever data you need!
+
+**MAKE SURE TO RUN IN ADMIN FOR IT TO WORK!**
 
 Current stats available include:
   * Rank - Find out any players rank with just their name and tag
@@ -22,13 +24,12 @@ Current stats available include:
  
 
 # Current issues/bugs that will be fixed in the next update(s)
-* Sometimes it will say someone peaked ascendent in an act where the rank was not even out
+* No known bugs atm, if you find one please contact tiddybite#6304 on discord!
 
 # Upcoming features
 * Color customization
 * Match skins command
 * Multi login
-* Match stats working in agents select
 
 
 # Credits and support
