@@ -190,7 +190,7 @@ def getRankByName(name, tag, region, act, t, en):
         output = [500, "Error", "N/A", 0, "Error", 0, "Error", "Player does not exist!"]
         return output
     elif puuid == "403":
-        output = [403, "Error", "N/A", 0, "Error", 0, "Error", "Couldn't fetch rank! Try contacting dev in help section!"]
+        output = [403, "Error", "N/A", 0, "Error", 0, "Error", "Couldn't fetch rank! Make sure name is spelled correct, if it is then contact dev for help!"]
         return output
     url = f'https://pd.{region}.a.pvp.net/mmr/v1/players/{puuid}'
     headers = {
@@ -203,7 +203,7 @@ def getRankByName(name, tag, region, act, t, en):
     status = str(r.status_code)
     r2 = get('https://valorant-api.com/v1/competitivetiers')
     x = r2.json()
-    maxRank = getMaxRank(region, en, t, puuid)
+    maxRank = MaxRank(region, en, t, puuid)
     if maxRank[0] == -1: #Player has never had a rank
         output = [50, "UNRANKED", "N/A", 0, "UNRANKED", 0, "N/A", "Player has never played ranked, or incorrect region input!"]
         return output
@@ -240,8 +240,10 @@ def getRankByName(name, tag, region, act, t, en):
 
 
 # Gets a players max rank and max season using their puuid
-def getMaxRank(region, en, t, puuid):
+def MaxRank(region, en, t, puuid):
     actsDictionary = acts
+    oldImmortalPlus = {21: 24, 22: 25, 23: 26, 24: 27}
+    ranks = {}
     url = f'https://pd.{region}.a.pvp.net/mmr/v1/players/{puuid}'
     headers = {
         'X-Riot-Entitlements-JWT': en,
@@ -257,15 +259,24 @@ def getMaxRank(region, en, t, puuid):
     y = r.json()
     maxRank = [-1, '']
     seasons = y["QueueSkills"]["competitive"].get("SeasonalInfoBySeasonID")
-    if seasons is not None:
-        for season in y["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"]:
-            if y["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][season]["WinsByTier"] is not None:
-                for winByTier in y["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][season]["WinsByTier"]:
-                    if int(winByTier) > maxRank[0]:
-                        maxRank[1] = list(actsDictionary.keys())[list(actsDictionary.values()).index(season)]
-                        maxRank[0] = int(winByTier)
+    if seasons is None:
+        return maxRank
+    for i in actsDictionary:
+        if actsDictionary[i] in y["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"]:
+            ranks[actsDictionary[i]] = y["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][actsDictionary[i]]
+    for i in ranks:
+        if ranks[i]["WinsByTier"] is None:
+            continue
+        for j in ranks[i]["WinsByTier"]:
+            tier = int(j)
+        if tier >= maxRank[0]:
+            maxRank[0] = tier
+            maxRank[1] = list(actsDictionary.keys())[list(actsDictionary.values()).index(i)]
+            xAct = int(maxRank[1][1:2]) - 1
+            if xAct <= 3:
+                if maxRank[0] in oldImmortalPlus:
+                    maxRank[0] = oldImmortalPlus[maxRank[0]]
     return maxRank
-
 
 def getSkins():
     global weaponsDictionary
@@ -333,17 +344,35 @@ def playerStats(i, region, en, t, y, team, agentsDictionary):
     lock.release()
 
 
+def playerStatsPre(i, region, en, t, y, team, agentsDictionary):
+    global mStatsOutput
+    rankData = getMatchRanks(region, en, t, y['AllyTeam']['Players'][i]['Subject'])
+    nameFromPUUID = getNameFromPUUID(y['AllyTeam']['Players'][i]['Subject'], region, t)
+    name = nameFromPUUID[0]
+    if y['AllyTeam']['Players'][i]['CharacterID'] != "":
+        agent = agentsDictionary[y['AllyTeam']['Players'][i]['CharacterID']]
+    else:
+        agent = "None"
+    lock.acquire()
+    mStatsOutput[team].append({'puuid': y['AllyTeam']['Players'][i]['Subject'], 'name': name, 'agent': agent, 'rank': rankData[0], 'rr': rankData[1], 'peak': rankData[2], 'peakSeason': rankData[3]})
+    lock.release()
+
+
 # Gets users match stats
 def matchStats(t, en, puuid, region):
     global mStatsOutput
     agentsDictionary = getAgents()
-    matchID = getCurrentMatchID(t, en, puuid, region)
+    matchInfo = getCurrentMatchID(t, en, puuid, region)
+    matchID = matchInfo[0]
     if matchID != "-1":
         matchid = matchID
     else:
         mStatsOutput = {'status': -1}
         return mStatsOutput
-    url = f'https://glz-{region}-1.{region}.a.pvp.net/core-game/v1/matches/{matchid}'
+    if matchInfo[1] == "post":
+        url = f'https://glz-{region}-1.{region}.a.pvp.net/core-game/v1/matches/{matchid}'
+    else:
+        url = f'https://glz-{region}-1.{region}.a.pvp.net/pregame/v1/matches/{matchid}'
     headers = {
         'X-Riot-Entitlements-JWT': en,
         'Authorization': f'Bearer {t}'
@@ -353,37 +382,55 @@ def matchStats(t, en, puuid, region):
         mStatsOutput = {'status': -1}
         return mStatsOutput
     y = r.json()
-    players = y['Players']
-    ffa = False
-    if y['ModeID'] == '/Game/GameModes/Deathmatch/DeathmatchGameMode.DeathmatchGameMode_C':
-        ffa = True
-    if ffa == False:
-        mStatsOutput = {}
-        mStatsOutput['status'] = 200
-        mStatsOutput['ffa'] = 0
-        mStatsOutput['blueTeam'] = []
-        mStatsOutput['redTeam'] = []
-        threads = []
-        for i in range(len(players)):
-            if y['Players'][i]['TeamID'] == "Blue":
-                temp = Thread(target=playerStats, args=(i, region, en, t, y, "blueTeam", agentsDictionary,))
+    if matchInfo[1] == "post":
+        players = y['Players']
+        ffa = False
+        if y['ModeID'] == '/Game/GameModes/Deathmatch/DeathmatchGameMode.DeathmatchGameMode_C':
+            ffa = True
+        if ffa == False:
+            mStatsOutput = {}
+            mStatsOutput['status'] = 200
+            mStatsOutput['ffa'] = 0
+            mStatsOutput['blueTeam'] = []
+            mStatsOutput['redTeam'] = []
+            mStatsOutput['type'] = "post"
+            threads = []
+            for i in range(len(players)):
+                if y['Players'][i]['TeamID'] == "Blue":
+                    temp = Thread(target=playerStats, args=(i, region, en, t, y, "blueTeam", agentsDictionary,))
+                    temp.start()
+                    threads.append(temp)
+                else:
+                    temp = Thread(target=playerStats, args=(i, region, en, t, y, "redTeam", agentsDictionary,))
+                    temp.start()
+                    threads.append(temp)
+            for i in range(len(players)):
+                threads[i].join()
+            return mStatsOutput
+        else:
+            mStatsOutput = {}
+            mStatsOutput['status'] = 200
+            mStatsOutput['ffa'] = 1
+            mStatsOutput['players'] = []
+            mStatsOutput['type'] = "post"
+            threads = []
+            for i in range(len(players)):
+                temp = Thread(target=playerStats, args=(i, region, en, t, y, "players", agentsDictionary,))
                 temp.start()
                 threads.append(temp)
-            else:
-                temp = Thread(target=playerStats, args=(i, region, en, t, y, "redTeam", agentsDictionary,))
-                temp.start()
-                threads.append(temp)
-        for i in range(len(players)):
-            threads[i].join()
-        return mStatsOutput
+            for i in range(len(players)):
+                threads[i].join()
+            return mStatsOutput
     else:
         mStatsOutput = {}
         mStatsOutput['status'] = 200
-        mStatsOutput['ffa'] = 1
-        mStatsOutput['players'] = []
+        mStatsOutput['ffa'] = 0
+        mStatsOutput['type'] = "pre"
+        mStatsOutput['allies'] = []
+        players = y["AllyTeam"]["Players"]
         threads = []
         for i in range(len(players)):
-            temp = Thread(target=playerStats, args=(i, region, en, t, y, "players", agentsDictionary,))
+            temp = Thread(target=playerStatsPre, args=(i, region, en, t, y, "allies", agentsDictionary,))
             temp.start()
             threads.append(temp)
         for i in range(len(players)):
@@ -400,11 +447,24 @@ def getCurrentMatchID(t, en, puuid, region):
         'Authorization': f'Bearer {t}'
     }
     r = get(url, headers=headers)
-    y = r.text
+    y = r.json()
     if str(r.status_code) != "200":
-        return "-1"
+        url = f'https://glz-{region}-1.{region}.a.pvp.net/pregame/v1/players/{puuid}'
+        headers = {
+            'X-Riot-Entitlements-JWT': en,
+            'Authorization': f'Bearer {t}'
+        }
+        r = get(url, headers=headers)
+        y = r.json()
+        if str(r.status_code) != "200":
+            return "-1"
+        else:
+            output = ["", "pre"]
+            output[0] = y["MatchID"]
+            return output
     else:
-        output = y[indexOf(y, 'MatchID') + 10:indexOf(y, '","Version')]
+        output = ["", "post"]
+        output[0] = y["MatchID"]
         return output
 
 
@@ -424,12 +484,13 @@ def getMatchRanks(region, en, t, puuid):
     status = str(r.status_code)
     r2 = get('https://valorant-api.com/v1/competitivetiers')
     x = r2.json()
-    maxRank = getMaxRank(region, en, t, puuid)
+    maxRank = MaxRank(region, en, t, puuid)
     if maxRank[0] == -1:
         rank = ["UNRANKED", "N/A", "UNRANKED", "E0A0"]
         return rank
     elif maxRank[0] == 429:
         rank = ["Rate Limit", "N/A", "Rate Limit", "E0A0"]
+        return rank
     maxrank = x['data'][xAct]['tiers'][maxRank[0]]['tierName']
     maxSeason = maxRank[1]
     if status != "200":

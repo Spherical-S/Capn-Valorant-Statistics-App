@@ -2,6 +2,8 @@ import tkinter.messagebox
 from tkinter import *
 from random import randint
 from json import dump, load
+import tkinter.font as TkFont
+from pyglet import font
 
 def submit():
     code = code_input.get()
@@ -31,6 +33,9 @@ icon = PhotoImage(file="icon.ico")
 mfa_win.iconphoto(True, icon)
 mfa_win.config(background=PURPLE)
 mfa_win.resizable(False, False)
+
+if not ('Orbitron' in TkFont.families()):
+    font.add_file('Orbitron-Bold.ttf')
 
 left_frame = Frame(mfa_win, bg=PURPLE)
 right_frame = Frame(mfa_win, bg=PURPLE)

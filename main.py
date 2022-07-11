@@ -363,6 +363,47 @@ def displayMatchStats():
         title_label.pack(pady=5)
         error_label.pack()
     else:
+        if output["type"] == "pre":
+            loading_sublabel.destroy()
+            loading_label.destroy()
+            displayData = {}
+            displayData['currentTeam'] = "Ally"
+            displayData['AllyNames'] = "Player\n            \n"
+            displayData['AllyRanks'] = "Rank\n          \n"
+            displayData['AllyRRs'] = "RR\n   \n"
+            displayData['AllyPeaks'] = "Peak\n          \n"
+            displayData['AllyPeakSeasons'] = "Peak\nAct\n"
+            for i in range(len(output['allies'])):
+                displayData['AllyNames'] += f"{output['allies'][i]['name'][:12]}\n({output['allies'][i]['agent']})\n"
+                displayData['AllyRanks'] += output['allies'][i]['rank'] + "\n\n"
+                displayData['AllyRRs'] += output['allies'][i]['rr'] + "\n\n"
+                displayData['AllyPeaks'] += output['allies'][i]['peak'] + "\n\n"
+                displayData['AllyPeakSeasons'] += output['allies'][i]['peakSeason'] + "\n\n"
+            title_label = Label(window, text="Match Stats", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
+            current_menu.append(title_label)  # 0
+            back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, command=submitCommand)
+            current_menu.append(back_button)  # 1
+            team_label = Label(window, text=displayData['currentTeam'] + " Team", font=("Orbitron", 20), fg=BLACK, bg=PURPLE)
+            current_menu.append(team_label)  # 2
+            names_label = Label(window, text=displayData['AllyNames'], font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
+            current_menu.append(names_label)  # 3
+            ranks_label = Label(window, text=displayData['AllyRanks'], font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
+            current_menu.append(ranks_label)  # 4
+            rrs_label = Label(window, text=displayData['AllyRRs'], font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
+            current_menu.append(rrs_label)  # 5
+            peaks_label = Label(window, text=displayData['AllyPeaks'], font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
+            current_menu.append(peaks_label)  # 6
+            peakSeasons_label = Label(window, text=displayData['AllyPeakSeasons'], font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
+            current_menu.append(peakSeasons_label)  # 7
+            back_button.place(x=10, y=15)
+            title_label.pack(pady=5)
+            team_label.pack()
+            names_label.place(x=110, y=120)
+            ranks_label.place(x=310, y=120)
+            rrs_label.place(x=470, y=120)
+            peaks_label.place(x=530, y=120)
+            peakSeasons_label.place(x=710, y=120)
+            return
         if output['ffa'] == 0:
             loading_sublabel.destroy()
             loading_label.destroy()
@@ -669,7 +710,7 @@ try: # Put it all in a try... except to catch all errors and log them
     ### INITIALIZING IMPORTANT VARIABLES ###
     PURPLE = '#400080'
     BLACK = '#000000'
-    current_version = "1.0.7"
+    current_version = "1.0.8"
     region = ""
     enc_key = "0"
     logins = {}
