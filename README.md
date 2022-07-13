@@ -42,3 +42,7 @@ I am a begginer python programmer with little expirience with creating UI's so i
 Want to support me? click the button below to go to my donation page!
 
 [![Donate](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/spherical)
+
+# Legal
+
+This application is not affiliated with Riot games. Riot does not endorse nor sponsor Capn - Valorant statistics app. In the case you need to contact the developer of this project, please message tiddybite#6304 on discord!
