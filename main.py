@@ -2,6 +2,7 @@ import util
 import logging
 from tkinter import *
 from tkinter import messagebox
+from tkinter.colorchooser import askcolor
 from pyglet import font
 import tkinter.font as TkFont
 from auth import *
@@ -16,6 +17,7 @@ from cryptocode import encrypt, decrypt
 from dotenv import load_dotenv
 from ctypes import windll
 from sys import executable, argv
+from configparser import ConfigParser
 load_dotenv()
 
 
@@ -198,9 +200,37 @@ def submitCommand():
             displayMainMenu()
 
 
-# next 6 definition display the specified commands gui
+# gets user from settings to main menu
+def settingToMain():
+    for i in range(len(current_menu)):
+        current_menu[i].destroy()
+    current_menu.clear()
+    displayMainMenu()
+
+
+def customizeColors():
+    global BLACK
+    global PURPLE
+    bgChange = messagebox.askyesno("Color customization", "Would you like to change the background color?")
+    if bgChange:
+        bgColor = askcolor(title="Background color picker")
+        settings['DEFAULT']['bg'] = bgColor[1]
+        PURPLE = bgColor[1]
+    fgChange = messagebox.askyesno("Color customization", "Would you like to change the foreground color?")
+    if fgChange:
+        fgColor = askcolor(title="Foreground color picker")
+        settings['DEFAULT']['fg'] = fgColor[1]
+        BLACK = fgColor[1]
+    f = open("settings.ini", "w")
+    settings.write(f)
+    f.close()
+
+
+# next 7 definition display the specified commands gui
 def displayMainMenu():
     global main_menu
+    window.config(background=PURPLE)
+    window.cog = PhotoImage("visualcontent\\cog.png")
     window.bind('<Return>', lambda event: submitCommand())
     main_menu.clear()
     title_label = Label(window, text="Aye Aye Capn!", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
@@ -225,6 +255,8 @@ def displayMainMenu():
     main_menu.append(created_by) # 9
     logged_in_as = Label(window, text=f"Logged in as {decrypt(logins['username'], enc_key)}", font=("Orbitron", 12), fg=BLACK, bg=PURPLE)
     main_menu.append(logged_in_as) # 10
+    settings_button = Button(window, cursor="hand2", text="⚙", font=("Orbitron", 12), bg=PURPLE, fg=BLACK, width=2, height=1, command=displaySettings)
+    main_menu.append(settings_button) # 11
     title_label.place(x=311, y=5)
     rank_button.place(x=70, y=85)
     store_button.place(x=345, y=85)
@@ -236,6 +268,20 @@ def displayMainMenu():
     error_label.pack(pady=50)
     logged_in_as.pack(side=BOTTOM, anchor='se', pady=5)
     created_by.place(x=5, y=470)
+    settings_button.place(x=5, y=5)
+
+
+def displaySettings():
+    destroyMainMenu()
+    title_label = Label(window, text="Settings", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
+    current_menu.append(title_label)  # 0
+    back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, command=settingToMain)
+    current_menu.append(back_button)  # 1
+    color_button = Button(window, cursor="hand2", text="Customize colors", font=("Orbitron", 20), bg=PURPLE, fg=BLACK, width=14, command=customizeColors)
+    current_menu.append(color_button)
+    back_button.place(x=10, y=15)
+    title_label.pack(pady=5)
+    color_button.place(x=310, y=180)
 
 
 def displayRankMenu(player, tag, region, act):
@@ -708,9 +754,11 @@ def login(self):
 
 try: # Put it all in a try... except to catch all errors and log them
     ### INITIALIZING IMPORTANT VARIABLES ###
-    PURPLE = '#400080'
-    BLACK = '#000000'
-    current_version = "1.0.8"
+    settings = ConfigParser()
+    settings.read('settings.ini')
+    PURPLE = settings['DEFAULT']['bg']
+    BLACK = settings['DEFAULT']['fg']
+    current_version = "1.0.9"
     region = ""
     enc_key = "0"
     logins = {}
