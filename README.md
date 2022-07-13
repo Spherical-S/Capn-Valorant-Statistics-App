@@ -7,6 +7,7 @@ CAPN - Valorant Statistics is an application designed to help valorant players f
 
 # Safety
 * Windows may detect Capn as a virus, this is a **false positive**. Here is a link to a virus scan done for v1.0.9: https://www.virustotal.com/gui/file/0870c38a6561556d6a2a037673fc7703a1d2111d23fce41a6027b31d5032473d?nocache=1
+* If windows says it protected your PC, you may still run capn/the capn installer by clicking on "More info" then "run anyways"
 * You must run Capn with **administrator priveliges** or it may not work!
 * All sensitive data is encrypted and stored on your local machine. It is your job to keep that information safe!
 
