@@ -6,7 +6,7 @@ Version: 1.0.9
 CAPN - Valorant Statistics is an application designed to help valorant players find out cool statistics easily. All you have to do is download the app, launch it, and get whatever data you need!
 
 # Safety
-* Windows may detect Capn as a virus, this is a **false positive**. Here is a link to a virus scan done for v1.0.8: https://www.virustotal.com/gui/file/f9495102c3bb3f449b0e88427ece7ffb2db9df93738f1951fc103d9277d83356?nocache=1
+* Windows may detect Capn as a virus, this is a **false positive**. Here is a link to a virus scan done for v1.0.9: https://www.virustotal.com/gui/file/0870c38a6561556d6a2a037673fc7703a1d2111d23fce41a6027b31d5032473d?nocache=1
 * You must run Capn with **administrator priveliges** or it may not work!
 * All sensitive data is encrypted and stored on your local machine. It is your job to keep that information safe!
 
