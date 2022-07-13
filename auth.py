@@ -7,49 +7,48 @@ from collections import OrderedDict
 from re import compile
 from json import load
 from time import sleep
-from os import environ, startfile
-from cryptocode import decrypt
+from os import startfile
+from cryptocode import decrypt, encrypt
 from datetime import datetime
-from dotenv import load_dotenv
-load_dotenv()
+from configparser import ConfigParser
+
 
 class TLSAdapter(HTTPAdapter):
     def init_poolmanager(self, connections, maxsize, block=False):
         self.poolmanager = PoolManager(num_pools=connections, maxsize=maxsize, block=block, ssl_version=PROTOCOL_TLSv1_2)
 
 def checkLogins(): #Checks if user is logged in, if they are check if the logins are valid or ask for 2fa code
-    global logins
-    output = [0, "", "", "", ""] #[0] holds value for if login was success, [1] holds token, [2] holds entitlement, [3] holds puuid, [4] holds value for mfa
-    f = open('config.json', 'r')
-    logins = load(f)
-    f.close()
-    if logins['username'] == "" and logins['password'] == "" and logins['region'] == "":
+    settings = ConfigParser()
+    settings.read("settings.ini")
+    enc_key = settings['DEFAULT']['CAPNKEY']
+    output = [0] #[0] means success, [1] means fail
+    if settings['DEFAULT']['username'] == "" or settings['DEFAULT']['password'] == "" or settings['DEFAULT']['region'] == "":
         output = [1, "", "", "", ""]
         return output #1 means not logged in or incorrect details
     else:
-        if logins['mfa'] == "1":
+        if settings['DEFAULT']['mfa'] == "1":
             now = datetime.now()
             time = int(now.strftime("%Y%m%d%H%M%S"))
-            expiry = int(logins['expiry'])
+            expiry = int(settings['DEFAULT']['expiry'])
             if expiry >= time:
-                return [0, decrypt(logins['token'], environ.get('CAPNKEY')), decrypt(logins['entitlement'], environ.get('CAPNKEY')), logins['puuid'], '1']
+                return [0]
             else:
-                output = [1, "", "", "", ""]
+                output = [1]
                 return output
         else:
-            authorize = getAuth(decrypt(logins['username'], environ.get('CAPNKEY')), decrypt(logins['password'], environ.get('CAPNKEY')))
+            authorize = getAuth(decrypt(settings['DEFAULT']['username'], enc_key), decrypt(settings['DEFAULT']['password'], enc_key))
             if authorize[0] == "-1":
-                output = [1, "", "", ""]
+                output = [1]
                 return output
             else:
-                token = authorize[0]
-                en = authorize[1]
-                puuid = authorize[2]
-                output = [0, token, en, puuid, "0"]
+                output = [0]
                 return output
 
 
 def getAuth(username, password):
+    settings = ConfigParser()
+    settings.read("settings.ini")
+    enc_key = settings['DEFAULT']['CAPNKEY']
     headers = OrderedDict({
         "Accept-Language": "en-US,en;q=0.9",
         "Accept": "application/json, text/plain, */*",
@@ -80,23 +79,19 @@ def getAuth(username, password):
     mfa = "0"
     if data['type'] == 'auth':
         session.close()
-        return ["-1", "0"]
+        return ["-1"]
     elif data['type'] == 'multifactor':
         mfa = "1"
-        f = open('multifactor.json', 'r')
-        start = load(f)
-        f.close()
+        start = settings['DEFAULT']['check']
         startfile("multifactorauth.exe")
         while True:
-            f = open('multifactor.json', 'r')
-            temp = load(f)
-            f.close()
-            if temp['check'] != start['check']:
+            settings.read('settings.ini')
+            if settings['DEFAULT']['check'] != start:
                 break
             sleep(1)
         data = {
             "type": "multifactor",
-            "code": temp['code'],
+            "code": settings['DEFAULT']['code'],
             "rememberDevice": "True"
         }
         r2 = session.put('https://auth.riotgames.com/api/v1/authorization', json=data, headers=headers)
@@ -116,5 +111,13 @@ def getAuth(username, password):
     r = session.post('https://auth.riotgames.com/userinfo', headers=headers, json={})
     data = r.json()
     puuid = data['sub']
-    
-    return [token, entitlement, puuid, mfa]
+    settings['DEFAULT']['username'] = encrypt(username, enc_key)
+    settings['DEFAULT']['password'] = encrypt(password, enc_key)
+    settings['DEFAULT']['token'] = encrypt(token, enc_key)
+    settings['DEFAULT']['entitlement'] = encrypt(entitlement, enc_key)
+    settings['DEFAULT']['puuid'] = puuid
+    settings['DEFAULT']['mfa'] = mfa
+    f = open('settings.ini', 'w')
+    settings.write(f)
+    f.close()
+    return ["0"]

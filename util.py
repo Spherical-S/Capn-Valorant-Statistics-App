@@ -40,9 +40,9 @@ def colorDarken(old_hex):
     r = int(old_hex[1:3], 16)
     g = int(old_hex[3:5], 16)
     b = int(old_hex[5:7], 16)
-    r = r - 40
-    g = g - 40
-    b = b - 40
+    r = ceil(r*0.6)
+    g = ceil(g*0.6)
+    b = ceil(b*0.6)
     if r < 0:
         r = 0
     if g < 0:

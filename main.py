@@ -6,19 +6,13 @@ from tkinter.colorchooser import askcolor
 from pyglet import font
 import tkinter.font as TkFont
 from auth import *
-from json import load, dump
 from PIL import Image, ImageTk
-from os import environ
 from requests import get
 from webbrowser import open_new
 from datetime import datetime
 from traceback import print_exc
 from cryptocode import encrypt, decrypt
-from dotenv import load_dotenv
-from ctypes import windll
-from sys import executable, argv
 from configparser import ConfigParser
-load_dotenv()
 
 
 ### DEFINITIONS ###
@@ -34,6 +28,7 @@ def updateSelectedCommand(cmd):
     global main_menu
     selected_command = cmd
     darker = util.colorDarken(PURPLE)
+    darker = darker.upper()
     # Gets the UI ready for rank command
     if cmd == 1:
         main_menu[1]['bg'] = darker
@@ -208,6 +203,7 @@ def settingToMain():
     displayMainMenu()
 
 
+# changes colors to users choice
 def customizeColors():
     global BLACK
     global PURPLE
@@ -221,6 +217,10 @@ def customizeColors():
         fgColor = askcolor(title="Foreground color picker")
         settings['DEFAULT']['fg'] = fgColor[1]
         BLACK = fgColor[1]
+    for i in range(len(current_menu)):
+        current_menu[i]['bg'] = PURPLE
+        current_menu[i]['fg'] = BLACK
+    window.config(background=PURPLE)
     f = open("settings.ini", "w")
     settings.write(f)
     f.close()
@@ -229,7 +229,6 @@ def customizeColors():
 # next 7 definition display the specified commands gui
 def displayMainMenu():
     global main_menu
-    window.config(background=PURPLE)
     window.cog = PhotoImage("visualcontent\\cog.png")
     window.bind('<Return>', lambda event: submitCommand())
     main_menu.clear()
@@ -253,7 +252,7 @@ def displayMainMenu():
     main_menu.append(help_button)  # 8
     created_by = Label(window, text="Created by Spherical-S on github", font=("Orbitron", 12), fg=BLACK, bg=PURPLE)
     main_menu.append(created_by) # 9
-    logged_in_as = Label(window, text=f"Logged in as {decrypt(logins['username'], enc_key)}", font=("Orbitron", 12), fg=BLACK, bg=PURPLE)
+    logged_in_as = Label(window, text=f"Logged in as {decrypt(settings['DEFAULT']['username'], enc_key)}", font=("Orbitron", 12), fg=BLACK, bg=PURPLE)
     main_menu.append(logged_in_as) # 10
     settings_button = Button(window, cursor="hand2", text="⚙", font=("Orbitron", 12), bg=PURPLE, fg=BLACK, width=2, height=1, command=displaySettings)
     main_menu.append(settings_button) # 11
@@ -272,6 +271,7 @@ def displayMainMenu():
 
 
 def displaySettings():
+    resetArguments()
     destroyMainMenu()
     title_label = Label(window, text="Settings", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
     current_menu.append(title_label)  # 0
@@ -295,7 +295,7 @@ def displayRankMenu(player, tag, region, act):
     if act == "current":
         act = util.getCurrentSeason()
     xAct = int(act[1:2]) - 1
-    output = util.getRankByName(player, tag, region, act, logins_check[1], logins_check[2])
+    output = util.getRankByName(player, tag, region, act, decrypt(settings['DEFAULT']['token'], enc_key), decrypt(settings['DEFAULT']['entitlement'], enc_key))
     if xAct < 4:
         image = Image.open(f"visualcontent\\ranksold\\{str(output[3])}.png")
     else:
@@ -339,10 +339,10 @@ def displayStore():
     loading_sublabel = Label(window, text="Please wait while your store is being fetched", font=("Orbitron", 15),fg=BLACK, bg=PURPLE)
     loading_sublabel.pack()
     window.update()
-    t = logins_check[1]
-    en = logins_check[2]
-    puuid = logins_check[3]
-    region = logins['region']
+    t = decrypt(settings['DEFAULT']['token'], enc_key)
+    en = decrypt(settings['DEFAULT']['entitlement'], enc_key)
+    puuid = settings['DEFAULT']['puuid']
+    region = settings['DEFAULT']['region']
     store = util.getStore(t, en, puuid, region)
     balance = util.getBalance(t, en, puuid, region)
     window.temp = []
@@ -389,10 +389,10 @@ def displayMatchStats():
     loading_sublabel = Label(window, text="Please wait while your match stats are being fetched", font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
     loading_sublabel.pack()
     window.update()
-    t = logins_check[1]
-    en = logins_check[2]
-    puuid = logins_check[3]
-    region = logins['region']
+    t = decrypt(settings['DEFAULT']['token'], enc_key)
+    en = decrypt(settings['DEFAULT']['entitlement'], enc_key)
+    puuid = settings['DEFAULT']['puuid']
+    region = settings['DEFAULT']['region']
     output = util.matchStats(t, en, puuid, region)
     if output['status'] == -1:
         loading_sublabel.destroy()
@@ -569,22 +569,20 @@ def displayMatchSkins():
 
 def displayLogout():
     global region_buttons
-    global logins
     global logins_check
     window.unbind('<Return>')
-    logins['username'] = ""
-    logins['password'] = ""
-    logins['region'] = ""
-    logins['token'] = ""
-    logins['entitlement'] = ""
-    logins['puuid'] = ""
-    logins['mfa'] = ""
-    logins['expiry'] = ""
-    f = open("config.json", "w")
-    dump(logins, f)
+    settings['DEFAULT']['username'] = ""
+    settings['DEFAULT']['password'] = ""
+    settings['DEFAULT']['region'] = ""
+    settings['DEFAULT']['token'] = ""
+    settings['DEFAULT']['entitlement'] = ""
+    settings['DEFAULT']['puuid'] = ""
+    settings['DEFAULT']['mfa'] = ""
+    settings['DEFAULT']['expiry'] = ""
+    f = open("settings.ini", "w")
+    settings.write(f)
     f.close()
     window.bind("<Return>", login)
-    logins_check = checkLogins()
     region_buttons = [0, 0, 0, 0]
     displayLogin()
     region_buttons[0] = Button(window, cursor="hand2", text="NA", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, command=lambda num=0: selectRegion(num))
@@ -702,11 +700,9 @@ def selectRegion(regionNum):
             region_buttons[i]['bg'] = PURPLE
 
 
-# sends api call to log in, then writes it into config.json
+# sends api call to log in, then writes it into settings.ini
 def login(self):
     global region
-    global logins
-    global logins_check
     logging.info('made it into login()')
     current_menu[7]['text'] = "Checking logins, please wait!"
     window.update()
@@ -716,28 +712,21 @@ def login(self):
         current_menu[7]['text'] = "Missing fields!"
     else:
         authorization = getAuth(username, password)
+        settings.read('settings.ini')
         if authorization[0] == "-1":
             current_menu[7]['text'] = "Invalid logins!"
         else:
-            logins['username'] = encrypt(username, enc_key)
-            logins['password'] = encrypt(password, enc_key)
-            logins['region'] = region
-            logins['token'] = ""
-            logins['entitlement'] = ""
-            logins['puuid'] = ""
-            logins['mfa'] = ""
-            logins['expiry'] = ""
-            if authorization[3] == "1":
-                logins['mfa'] = "1"
-                logins['token'] = encrypt(authorization[0], enc_key)
-                logins['entitlement'] = encrypt(authorization[1], enc_key)
-                logins['puuid'] = authorization[2]
+            settings['DEFAULT']['username'] = encrypt(username, enc_key)
+            settings['DEFAULT']['password'] = encrypt(password, enc_key)
+            settings['DEFAULT']['region'] = region
+            settings['DEFAULT']['expiry'] = "0"
+            if settings['DEFAULT']['mfa'] == "1":
                 now = datetime.now()
                 exp = int(now.strftime("%Y%m%d%H%M%S"))
                 exp += 10000
-                logins['expiry'] = str(exp)
-            f = open("config.json", "w")
-            dump(logins, f)
+                settings['DEFAULT']['expiry'] = str(exp)
+            f = open("settings.ini", "w")
+            settings.write(f)
             f.close()
             for i in current_menu:
                 i.destroy()
@@ -745,11 +734,8 @@ def login(self):
                 i.destroy()
             region_buttons.clear()
             current_menu.clear()
-            f = open("config.json", 'r')
-            logins = load(f)
-            f.close()
+            settings.read('settings.ini')
             displayMainMenu()
-            logins_check = [0, authorization[0], authorization[1], authorization[2], authorization[3]]
 
 
 try: # Put it all in a try... except to catch all errors and log them
@@ -761,7 +747,6 @@ try: # Put it all in a try... except to catch all errors and log them
     current_version = "1.0.9"
     region = ""
     enc_key = "0"
-    logins = {}
     selected_command = 0
     args_list = []
     util.internet()
@@ -794,21 +779,15 @@ try: # Put it all in a try... except to catch all errors and log them
     window.update()
     util.internet()
 
-    #Checking if app is in admin mode
-    if not windll.shell32.IsUserAnAdmin():
-        windll.shell32.ShellExecuteW(None, "runas", executable, " ".join(argv), None, 1)
-        #messagebox.showwarning("No Administrator Privileges!", "Running Capn is recommended with administrator privileges!\nTo run Capn in admin:\n1. Right click the Capn app\n2. Select run as administrator.")
-
     #Checking if the key for encrypting is set
-    if len(environ['CAPNKEY']) != 8:
+    if len(settings['DEFAULT']['CAPNKEY']) != 8:
         enc_key = util.randomString(8)
-        f = open('.env', 'w')
-        f.truncate(0)
-        f.write(f'NOTE = "DO NOT CHANGE ANYTHING IN THIS FILE OR CAPN MAY NOT WORK"\nCAPNKEY = "{enc_key}"')
+        settings['DEFAULT']['CAPNKEY'] = enc_key
+        f = open('settings.ini', 'w')
+        settings.write(f)
         f.close()
-        load_dotenv()
     else:
-        enc_key = environ['CAPNKEY']
+        enc_key = settings['DEFAULT']['CAPNKEY']
 
     #### CHECKING FOR UPDATE ####
     r = get(url='https://raw.githubusercontent.com/Spherical-S/Capn-Valorant-Statistics-App/main/Verion.txt')
@@ -822,22 +801,20 @@ try: # Put it all in a try... except to catch all errors and log them
     ### CHECK LOGINS AND GET TOKEN, ENTITLEMENT AND PUUID ###
     if logins_check[0] == 0:
         check_logins_label.destroy()
-        f = open("config.json", 'r')
-        logins = load(f)
-        f.close()
+        settings.read('settings.ini')
         displayMainMenu()
     elif logins_check[0] == 1:
         check_logins_label.destroy()
-        logins['username'] = ""
-        logins['password'] = ""
-        logins['region'] = ""
-        logins['token'] = ""
-        logins['entitlement'] = ""
-        logins['puuid'] = ""
-        logins['mfa'] = ""
-        logins['expiry'] = ""
-        f = open("config.json", "w")
-        dump(logins, f)
+        settings['DEFAULT']['username'] = ""
+        settings['DEFAULT']['password'] = ""
+        settings['DEFAULT']['region'] = ""
+        settings['DEFAULT']['token'] = ""
+        settings['DEFAULT']['entitlement'] = ""
+        settings['DEFAULT']['puuid'] = ""
+        settings['DEFAULT']['mfa'] = ""
+        settings['DEFAULT']['expiry'] = ""
+        f = open("settings.ini", "w")
+        settings.write(f)
         f.close()
         window.bind("<Return>", login)
         displayLogin()
