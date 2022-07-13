@@ -30,9 +30,9 @@ CAPN - Valorant Statistics is an application designed to help valorant players f
 * No known bugs atm, if you find one please contact tiddybite#6304 on discord!
 
 # Upcoming features
-* Color customization
 * Match skins command
 * Multi login
+* Change skin mid game (maybe, I don't know if its possible yet)
 
 
 # Credits and support
