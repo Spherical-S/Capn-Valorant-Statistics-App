@@ -33,8 +33,7 @@ CAPN - Valorant Statistics is an application designed to help valorant players f
 # Upcoming features
 * Match skins command
 * Multi login
-* Change skin mid game (maybe, I don't know if its possible yet)
-
+* More stats in match stats (headshot %, winrate %, whos queued with who, and possibly last three games won/lost for everyone in the lobby)
 
 # Credits and support
 
