@@ -1,3 +1,4 @@
+from json import dump, load
 from tkinter import messagebox
 from requests import get, put
 from datetime import datetime
@@ -14,7 +15,9 @@ acts = {}
 agents = {}
 weaponsDictionary = {}
 mStatsOutput = []
+mSkinsOutput = {}
 lock = Lock()
+key = "Private" #Cant make my api key public!
 
 
 def internet():
@@ -154,7 +157,8 @@ def getValoVersion():
 # gets a player puuid with their name and tag
 def getOtherPUUID(name, tagline, region):
     headers = {
-        'accept': 'application / json'
+        'accept': 'application / json',
+        'Authorization': key
     }
     url = f'https://api.henrikdev.xyz/valorant/v1/account/{name}/{tagline}'
     r = get(url, headers=headers)
@@ -190,7 +194,7 @@ def getRankByName(name, tag, region, act, t, en):
         output = [500, "Error", "N/A", 0, "Error", 0, "Error", "Player does not exist!"]
         return output
     elif puuid == "403":
-        output = [403, "Error", "N/A", 0, "Error", 0, "Error", "Couldn't fetch rank! Make sure name is spelled correct, if it is then contact dev for help!"]
+        output = [403, "Error", "N/A", 0, "Error", 0, "Error", "Couldn't fetch rank! Make sure name is spelled correct!"]
         return output
     url = f'https://pd.{region}.a.pvp.net/mmr/v1/players/{puuid}'
     headers = {
@@ -337,8 +341,11 @@ def getBalance(t, en, puuid, region):
 def playerStats(i, region, en, t, y, team, agentsDictionary):
     global mStatsOutput
     rankData = getMatchRanks(region, en, t, y['Players'][i]['Subject'])
-    nameFromPUUID = getNameFromPUUID(y['Players'][i]['Subject'], region, t)
-    name = nameFromPUUID[0]
+    if not y['Players'][i]['PlayerIdentity']['Incognito']:
+        nameFromPUUID = getNameFromPUUID(y['Players'][i]['Subject'], region, t)
+        name = nameFromPUUID[0]
+    else:
+        name = "Hidden"
     lock.acquire()
     mStatsOutput[team].append({'puuid': y['Players'][i]['Subject'], 'name': name, 'agent': agentsDictionary[y['Players'][i]['CharacterID']], 'rank': rankData[0], 'rr': rankData[1], 'peak': rankData[2], 'peakSeason': rankData[3]})
     lock.release()
@@ -347,8 +354,11 @@ def playerStats(i, region, en, t, y, team, agentsDictionary):
 def playerStatsPre(i, region, en, t, y, team, agentsDictionary):
     global mStatsOutput
     rankData = getMatchRanks(region, en, t, y['AllyTeam']['Players'][i]['Subject'])
-    nameFromPUUID = getNameFromPUUID(y['AllyTeam']['Players'][i]['Subject'], region, t)
-    name = nameFromPUUID[0]
+    if y['AllyTeam']['Players'][i]['PlayerIdentity']['Incognito']:
+        nameFromPUUID = getNameFromPUUID(y['AllyTeam']['Players'][i]['Subject'], region, t)
+        name = nameFromPUUID[0]
+    else:
+        name = "Hidden"
     if y['AllyTeam']['Players'][i]['CharacterID'] != "":
         agent = agentsDictionary[y['AllyTeam']['Players'][i]['CharacterID']]
     else:
@@ -438,7 +448,6 @@ def matchStats(t, en, puuid, region):
         return mStatsOutput
 
 
-
 # gets the players match ID
 def getCurrentMatchID(t, en, puuid, region):
     url = f'https://glz-{region}-1.{region}.a.pvp.net/core-game/v1/players/{puuid}'
@@ -457,7 +466,7 @@ def getCurrentMatchID(t, en, puuid, region):
         r = get(url, headers=headers)
         y = r.json()
         if str(r.status_code) != "200":
-            return "-1"
+            return ["-1", "pre"]
         else:
             output = ["", "pre"]
             output[0] = y["MatchID"]
@@ -470,6 +479,10 @@ def getCurrentMatchID(t, en, puuid, region):
 
 # Gets a players max rank for the match stats command
 def getMatchRanks(region, en, t, puuid):
+    short = {"PLATINUM 1": "PLAT 1", "PLATINUM 2": "PLAT 2", "PLATINUM 3": "PLAT 3",
+             "DIAMOND 1": "DIA 1", "DIAMOND 2": "DIA 2", "DIAMOND 3": "DIA 3",
+             "ASCENDANT 1": "ASC 1", "ASCENDANT 2": "ASC 2", "ASCENDANT 3": "ASC 3",
+             "IMMORTAL 1": "IMM 1", "IMMORTAL 2": "IMM 2", "IMMORTAL 3": "IMM 3"}
     act = getCurrentSeason()
     xAct = int(act[1:2]) - 1
     actsDictionary = acts
@@ -493,12 +506,16 @@ def getMatchRanks(region, en, t, puuid):
         return rank
     maxrank = x['data'][xAct]['tiers'][maxRank[0]]['tierName']
     maxSeason = maxRank[1]
+    if maxrank in short:
+        maxrank = short[maxrank]
     if status != "200":
         return ["Rate Limit", "N/A", "Rate Limit", "E0A0"]
     y = r.json()
     try:
         rankTIER = y["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][actsDictionary[act]]["CompetitiveTier"]
         rank = x['data'][xAct]['tiers'][rankTIER]['tierName']
+        if rank in short:
+            rank = short[rank]
         if rank == 'UNRANKED':
             output = ['UNRANKED', 'N/A', maxrank, maxSeason]
             return output
@@ -515,6 +532,108 @@ def getMatchRanks(region, en, t, puuid):
     except KeyError:
         output = ['UNRANKED', 'N/A', maxrank, maxSeason]
         return output
+
+
+def getWeapons():
+    url = "https://valorant-api.com/v1/weapons"
+    r = get(url)
+    y = r.json()
+    weapons = {}
+    for i in range(len(y['data'])):
+        weapons[y['data'][i]['uuid']] = y['data'][i]['displayName']
+    return weapons
+
+
+def sortSkins(loadout, weapons):
+    loadout = loadout['Loadout']['Items']
+    skins = {}
+    for i in loadout:
+        gun = weapons[i]
+        skin = weaponsDictionary[loadout[i]['Sockets']['bcef87d6-209b-46c6-8b19-fbe40bd95abc']["Item"]["ID"]]
+        skins[gun] = skin
+    return skins
+
+
+def playerSkins(i, region, en, t, players, loadouts, team, agentsDictionary, weapons):
+    global mSkinsOutput
+    if not players[i]['PlayerIdentity']['Incognito']:
+        nameFromPUUID = getNameFromPUUID(players[i]['Subject'], region, t)
+        name = nameFromPUUID[0]
+    else:
+        name = "Hidden"
+    agent = agentsDictionary[players[i]['CharacterID']]
+    skins = sortSkins(loadouts[i], weapons)
+    lock.acquire()
+    mSkinsOutput[team].append({'puuid': players[i]['Subject'], 'name': name, 'agent': agent, 'skins': skins})
+    lock.release()
+
+
+def matchSkins(t, en, puuid, region):
+    global mSkinsOutput
+    getSkins()
+    agentsDictionary = getAgents()
+    weapons = getWeapons()
+    matchInfo = getCurrentMatchID(t, en, puuid, region)
+    matchID = matchInfo[0]
+    if matchID != "-1":
+        matchid = matchID
+    else:
+        mSkinsOutput = {'status': -1}
+        return mSkinsOutput
+    if matchInfo[1] != "post":
+        url = f"https://glz-{region}-1.{region}.a.pvp.net/pregame/v1/matches/{matchid}/loadouts"
+        url2 = f"https://glz-{region}-1.{region}.a.pvp.net/pregame/v1/matches/{matchid}"
+        return {'status': -2}
+    else:
+        url = f'https://glz-{region}-1.{region}.a.pvp.net/core-game/v1/matches/{matchid}/loadouts'
+        url2 = f"https://glz-{region}-1.{region}.a.pvp.net/core-game/v1/matches/{matchid}"
+    headers = {
+        'X-Riot-Entitlements-JWT': en,
+        'Authorization': f'Bearer {t}'
+    }
+    r = get(url2, headers=headers)
+    x = r.json()
+    r = get(url, headers=headers)
+    y = r.json()
+    players = x['Players']
+    loadouts = y['Loadouts']
+    ffa = False
+    if x['ModeID'] == '/Game/GameModes/Deathmatch/DeathmatchGameMode.DeathmatchGameMode_C':
+        ffa = True
+    if ffa == False:
+        mSkinsOutput = {}
+        mSkinsOutput['status'] = 200
+        mSkinsOutput['ffa'] = 0
+        mSkinsOutput['blueTeam'] = []
+        mSkinsOutput['redTeam'] = []
+        mSkinsOutput['type'] = "post"
+        threads = []
+        for i in range(len(players)):
+            if x['Players'][i]['TeamID'] == "Blue":
+                temp = Thread(target=playerSkins, args=(i, region, en, t, players, loadouts, "blueTeam", agentsDictionary, weapons,))
+                temp.start()
+                threads.append(temp)
+            else:
+                temp = Thread(target=playerSkins, args=(i, region, en, t, players, loadouts, "redTeam", agentsDictionary, weapons,))
+                temp.start()
+                threads.append(temp)
+        for i in range(len(players)):
+            threads[i].join()
+        return mSkinsOutput
+    else:
+        mSkinsOutput = {}
+        mSkinsOutput['status'] = 200
+        mSkinsOutput['ffa'] = 1
+        mSkinsOutput['players'] = []
+        mSkinsOutput['type'] = "post"
+        threads = []
+        for i in range(len(players)):
+            temp = Thread(target=playerSkins, args=(i, region, en, t, players, loadouts, "players", agentsDictionary, weapons,))
+            temp.start()
+            threads.append(temp)
+        for i in range(len(players)):
+            threads[i].join()
+        return mSkinsOutput
 
 
 # Gets a players name from their puuid

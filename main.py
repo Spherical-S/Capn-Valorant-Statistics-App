@@ -97,7 +97,6 @@ def updateSelectedCommand(cmd):
         main_menu[8]['bg'] = PURPLE
         resetArguments()
         args_list.clear()
-        main_menu[7]['text'] = "Match skins command is still in development!"
     if cmd == 5:
         main_menu[5]['bg'] = darker
         main_menu[2]['bg'] = PURPLE
@@ -177,6 +176,9 @@ def submitCommand():
             displayMatchStats()
             return
         elif selected_command == 4:
+            selected_command = -1
+            destroyMainMenu()
+            displayMatchSkins()
             return
         elif selected_command == 5:
             selected_command = -1
@@ -275,7 +277,7 @@ def displaySettings():
     destroyMainMenu()
     title_label = Label(window, text="Settings", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
     current_menu.append(title_label)  # 0
-    back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, command=settingToMain)
+    back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, fg=BLACK, command=settingToMain)
     current_menu.append(back_button)  # 1
     color_button = Button(window, cursor="hand2", text="Customize colors", font=("Orbitron", 20), bg=PURPLE, fg=BLACK, width=14, command=customizeColors)
     current_menu.append(color_button)
@@ -304,7 +306,7 @@ def displayRankMenu(player, tag, region, act):
     window.img = ImageTk.PhotoImage(image)
     title_label = Label(window, text="Rank", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
     current_menu.append(title_label) #0
-    back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, command=submitCommand)
+    back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, fg=BLACK, command=submitCommand)
     current_menu.append(back_button) #1
     subtitle_label = Label(window, text=f"{player}#{tag} from {region}'s rank", font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
     current_menu.append(subtitle_label)  #2
@@ -351,7 +353,7 @@ def displayStore():
         window.temp.append(util.photoImagify(f"https://media.valorant-api.com/weaponskinlevels/{store['uuids'][i]}/displayicon.png"))
     title_label = Label(window, text="Store", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
     current_menu.append(title_label)  #0
-    back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, command=submitCommand)
+    back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, fg=BLACK, command=submitCommand)
     current_menu.append(back_button)  #1
     next_button = Button(window, cursor="hand2", text="-->", font=("Orbitron", 25), bg=PURPLE, command=lambda store=store: nextSkin(store))
     current_menu.append(next_button) #2
@@ -399,9 +401,9 @@ def displayMatchStats():
         loading_label.destroy()
         title_label = Label(window, text="Match Stats", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
         current_menu.append(title_label)  #0
-        back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, command=submitCommand)
+        back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, fg=BLACK, command=submitCommand)
         current_menu.append(back_button)  #1
-        error_label = Label(window, text="You must currently be in a game to use this command,\nagent select does not count!", font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
+        error_label = Label(window, text="You must currently be in a game to use this command", font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
         current_menu.append(error_label)
         loading_sublabel.destroy()
         loading_label.destroy()
@@ -427,7 +429,7 @@ def displayMatchStats():
                 displayData['AllyPeakSeasons'] += output['allies'][i]['peakSeason'] + "\n\n"
             title_label = Label(window, text="Match Stats", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
             current_menu.append(title_label)  # 0
-            back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, command=submitCommand)
+            back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, fg=BLACK, command=submitCommand)
             current_menu.append(back_button)  # 1
             team_label = Label(window, text=displayData['currentTeam'] + " Team", font=("Orbitron", 20), fg=BLACK, bg=PURPLE)
             current_menu.append(team_label)  # 2
@@ -479,7 +481,7 @@ def displayMatchStats():
                 displayData['redPeakSeasons'] += output['redTeam'][i]['peakSeason'] + "\n\n"
             title_label = Label(window, text="Match Stats", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
             current_menu.append(title_label)  # 0
-            back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, command=submitCommand)
+            back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, fg=BLACK, command=submitCommand)
             current_menu.append(back_button)  # 1
             next_button = Button(window, cursor="hand2", text="-->", font=("Orbitron", 25), bg=PURPLE, command=nextTeam)
             current_menu.append(next_button)  # 2
@@ -532,7 +534,7 @@ def displayMatchStats():
             current_menu.append(bottom_frame)
             title_label = Label(top_frame, text="Match Stats", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
             title_label.grid(row=0, column=1, padx=250)
-            back_button = Button(top_frame, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, command=submitCommand)
+            back_button = Button(top_frame, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, fg=BLACK, command=submitCommand)
             back_button.grid(row=0, column=0, padx=5)
             team_label = Label(top_frame, text="FFA", font=("Orbitron", 20), fg=BLACK, bg=PURPLE)
             team_label.grid(row=1, column=1, pady=5)
@@ -557,14 +559,145 @@ def displayMatchStats():
 
 
 def displayMatchSkins():
+    global displayData
+    global mSkinsOutput
     window.unbind('<Return>')
     util.internet()
-    title_label = Label(window, text="Match skins is still under development!", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
-    current_menu.append(title_label)  #0
-    back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, command=submitCommand)
-    current_menu.append(back_button)  # 1
-    back_button.place(x=10, y=15)
-    title_label.pack(pady=5)
+    loading_label = Label(window, text="Loading...", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
+    loading_label.pack()
+    loading_sublabel = Label(window, text="Please wait while your match stats are being fetched", font=("Orbitron", 15),fg=BLACK, bg=PURPLE)
+    loading_sublabel.pack()
+    window.update()
+    t = decrypt(settings['DEFAULT']['token'], enc_key)
+    en = decrypt(settings['DEFAULT']['entitlement'], enc_key)
+    puuid = settings['DEFAULT']['puuid']
+    region = settings['DEFAULT']['region']
+    output = util.matchSkins(t, en, puuid, region)
+    mSkinsOutput = output
+    if output['status'] == -1:
+        loading_sublabel.destroy()
+        loading_label.destroy()
+        title_label = Label(window, text="Match Skins", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
+        current_menu.append(title_label)  # 0
+        back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, fg=BLACK, command=submitCommand)
+        current_menu.append(back_button)  # 1
+        error_label = Label(window, text="You must currently be in a game to use this command", font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
+        current_menu.append(error_label)
+        loading_sublabel.destroy()
+        loading_label.destroy()
+        back_button.place(x=10, y=15)
+        title_label.pack(pady=5)
+        error_label.pack()
+    if output['status'] == -2:
+        loading_sublabel.destroy()
+        loading_label.destroy()
+        title_label = Label(window, text="Match Skins", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
+        current_menu.append(title_label)  # 0
+        back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, fg=BLACK, command=submitCommand)
+        current_menu.append(back_button)  # 1
+        error_label = Label(window, text="Due to a bug within riot games system,\nmatch skins only works after agent select.", font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
+        current_menu.append(error_label)
+        loading_sublabel.destroy()
+        loading_label.destroy()
+        back_button.place(x=10, y=15)
+        title_label.pack(pady=5)
+        error_label.pack()
+    if output['status'] == 200:
+        if output['ffa'] == 0:
+            loading_sublabel.destroy()
+            loading_label.destroy()
+            displayData = {}
+            displayData['currentTeam'] = "Blue"
+            displayData['currentGun'] = "Vandal"
+            displayData['blueNames'] = "Player\n============\n"
+            displayData['blueSkins'] = "Skin\n==============================\n"
+            for i in range(len(output['blueTeam'])):
+                displayData['blueNames'] += f"{output['blueTeam'][i]['name'][:12]}\n({output['blueTeam'][i]['agent']})\n"
+                displayData['blueSkins'] += output['blueTeam'][i]['skins']['Vandal'][:30] + "\n\n"
+            displayData['redNames'] = "Player\n============\n"
+            displayData['redSkins'] = "Skin\n==============================\n"
+            for i in range(len(output['redTeam'])):
+                displayData['redNames'] += f"{output['redTeam'][i]['name'][:12]}\n({output['redTeam'][i]['agent']})\n"
+                displayData['redSkins'] += output['redTeam'][i]['skins']['Vandal'][:30] + "\n\n"
+            title_label = Label(window, text="Match Stats", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
+            current_menu.append(title_label)  # 0
+            back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, fg=BLACK, command=submitCommand)
+            current_menu.append(back_button)  # 1
+            next_button = Button(window, cursor="hand2", text="-->", font=("Orbitron", 25), bg=PURPLE, command=nextTeamSkins)
+            current_menu.append(next_button)  # 2
+            prev_button = Button(window, cursor="hand2", text="<--", font=("Orbitron", 25), bg=PURPLE, command=nextTeamSkins)
+            current_menu.append(prev_button)  # 3
+            team_label = Label(window, text=displayData['currentTeam'] + " Team", font=("Orbitron", 20), fg=BLACK, bg=PURPLE)
+            current_menu.append(team_label)  # 4
+            names_label = Label(window, text=displayData['blueNames'], font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
+            current_menu.append(names_label)  # 5
+            var = StringVar(window)
+            temp = ['Vandal', 'Phantom', 'Operator', 'Sheriff', 'Ghost',
+                    'Classic', 'Spectre', 'Bulldog', 'Odin', 'Ares', 'Guardian',
+                    'Marshal', 'Stinger', 'Bucky', 'Judge', 'Frenzy', 'Shorty']
+            var.set(temp[0])
+            gun_width = len(max(temp, key=len))
+            args_list.append(var)
+            gun_select = OptionMenu(window, var, *temp, command=changeGun)
+            gun_select.config(bg=PURPLE, font=("Orbitron", 12), highlightthickness=0, width=gun_width)
+            current_menu.append(gun_select)  # 6
+            skins_label = Label(window, text=displayData['blueSkins'], font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
+            current_menu.append(skins_label)  # 7
+            back_button.place(x=10, y=15)
+            title_label.pack(pady=5)
+            team_label.pack()
+            next_button.place(x=795, y=210)
+            prev_button.place(x=20, y=210)
+            names_label.place(x=150, y=120)
+            skins_label.place(x=350, y=120)
+            gun_select.place(x=750, y=15)
+        else:
+            loading_sublabel.destroy()
+            loading_label.destroy()
+            displayData = {}
+            displayData['currentTeam'] = "FFA"
+            displayData['currentGun'] = "Vandal"
+            displayData['playerNames'] = "Player\n============\n"
+            displayData['playerSkins'] = "Skin\n==============================\n"
+            for i in range(len(output['players'])):
+                displayData['playerNames'] += f"{output['players'][i]['name'][:12]}\n({output['players'][i]['agent']})\n"
+                displayData['playerSkins'] += output['players'][i]['skins']['Vandal'][:30] + "\n\n"
+            top_frame = Frame(window, width=900, height=125, bg=PURPLE)
+            top_frame.grid(row=0, column=0, pady=5, sticky='n')
+            top_frame.grid_propagate(False)
+            bottom_frame = Frame(window, width=900, height=365, bg=PURPLE)
+            bottom_frame.grid(row=1, column=0, pady=5, sticky='s')
+            current_menu.append(top_frame) #0
+            current_menu.append(bottom_frame) #1
+            title_label = Label(top_frame, text="Match Skins", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
+            title_label.grid(row=0, column=1, padx=(250, 170))
+            back_button = Button(top_frame, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, fg=BLACK, command=submitCommand)
+            back_button.grid(row=0, column=0, padx=5)
+            team_label = Label(top_frame, text="FFA", font=("Orbitron", 20), fg=BLACK, bg=PURPLE)
+            team_label.grid(row=1, column=1, pady=5, padx=(90, 0))
+            var = StringVar(window)
+            temp = ['Vandal', 'Phantom', 'Operator', 'Sheriff', 'Ghost',
+                    'Classic', 'Spectre', 'Bulldog', 'Odin', 'Ares', 'Guardian',
+                    'Marshal', 'Stinger', 'Bucky', 'Judge', 'Frenzy', 'Shorty']
+            var.set(temp[0])
+            gun_width = len(max(temp, key=len))
+            args_list.append(var)
+            gun_select = OptionMenu(top_frame, var, *temp, command=changeGun)
+            gun_select.config(bg=PURPLE, font=("Orbitron", 12), highlightthickness=0, width=gun_width)
+            gun_select.grid(row=0, column=2)
+            canvas = Canvas(bottom_frame, height=365, width=885, bg=PURPLE, highlightthickness=0)
+            canvas.grid(row=0, column=0)
+            scroll = Scrollbar(bottom_frame, orient=VERTICAL, command=canvas.yview)
+            scroll.grid(row=0, column=1, sticky='ns')
+            canvas.configure(yscrollcommand=scroll.set)
+            canvas.bind('<Configure>', lambda e: canvas.configure(scrollregion=canvas.bbox('all')))
+            display_frame = Frame(canvas, bg=PURPLE)
+            canvas.create_window((0, 0), window=display_frame, anchor='n')
+            names_label = Label(display_frame, text=displayData['playerNames'], font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
+            names_label.grid(row=0, column=0, padx=100)
+            skins_label = Label(display_frame, text=displayData['playerSkins'], font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
+            skins_label.grid(row=0, column=1, padx=10)
+            current_menu.append(skins_label) #2
 
 
 def displayLogout():
@@ -599,7 +732,7 @@ def displayHelp():
     window.unbind('<Return>')
     title_label = Label(window, text="Help", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
     current_menu.append(title_label)  #0
-    back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, command=submitCommand)
+    back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, fg=BLACK, command=submitCommand)
     current_menu.append(back_button)  # 1
     bug_label = Label(window, text="Found a bug? Contact the dev with one of the following:\nDiscord: tiddybite#6304\nEmail: sadiq.shahid101@gmail.com\n ", font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
     current_menu.append(bug_label) #2
@@ -640,6 +773,7 @@ def displayLogin():
     error_label.pack(side="bottom", pady=10)
 
 
+# next 2 definitions switch the display for which skin in the users shop is being displayed
 def nextSkin(store):
     global current_menu
     global current_skin
@@ -662,6 +796,7 @@ def prevSkin(store):
     current_menu[6]['image'] = f"{window.temp[current_skin]}"
 
 
+# switches the display between teams for matchStats
 def nextTeam():
     global displayData
     if displayData['currentTeam'] == "Blue":
@@ -680,6 +815,45 @@ def nextTeam():
         current_menu[7]['text'] = displayData['blueRRs']
         current_menu[8]['text'] = displayData['bluePeaks']
         current_menu[9]['text'] = displayData['bluePeakSeasons']
+
+
+# switches the display between teams for matchSkins
+def nextTeamSkins():
+    global displayData
+    if displayData['currentTeam'] == "Blue":
+        displayData['currentTeam'] = "Red"
+        current_menu[4]['text'] = "Red"
+        current_menu[5]['text'] = displayData['redNames']
+        current_menu[7]['text'] = displayData['redSkins']
+    else:
+        displayData['currentTeam'] = "Blue"
+        current_menu[4]['text'] = "Blue"
+        current_menu[5]['text'] = displayData['blueNames']
+        current_menu[7]['text'] = displayData['blueSkins']
+
+
+# switches which gun's skins are being displayed for matchSkins
+def changeGun(newGun):
+    global displayData
+    global mSkinsOutput
+    displayData['currentGun'] = newGun
+    if mSkinsOutput['ffa'] == 0:
+        displayData['blueSkins'] = "Skin\n==============================\n"
+        for i in range(len(mSkinsOutput['blueTeam'])):
+            displayData['blueSkins'] += mSkinsOutput['blueTeam'][i]['skins'][newGun][:30] + "\n\n"
+        displayData['redSkins'] = "Skin\n==============================\n"
+        for i in range(len(mSkinsOutput['redTeam'])):
+            displayData['redSkins'] += mSkinsOutput['redTeam'][i]['skins'][newGun][:30] + "\n\n"
+        if displayData['currentTeam'] == "Blue":
+            current_menu[7]['text'] = displayData['blueSkins']
+        else:
+            current_menu[7]['text'] = displayData['redSkins']
+    else:
+        displayData['playerSkins'] = "Skin\n==============================\n"
+        for i in range(len(mSkinsOutput['players'])):
+            displayData['playerSkins'] += mSkinsOutput['players'][i]['skins'][newGun][:30] + "\n\n"
+        current_menu[2]['text'] = displayData['playerSkins']
+
 
 # updates the colour of the region buttons depending on which one is selected
 def selectRegion(regionNum):
@@ -744,7 +918,7 @@ try: # Put it all in a try... except to catch all errors and log them
     settings.read('settings.ini')
     PURPLE = settings['DEFAULT']['bg']
     BLACK = settings['DEFAULT']['fg']
-    current_version = "1.0.9"
+    current_version = "1.1.0"
     region = ""
     enc_key = "0"
     selected_command = 0
@@ -756,6 +930,7 @@ try: # Put it all in a try... except to catch all errors and log them
     current_menu = []
     current_skin = 0
     displayData = {}
+    mSkinsOutput = {}
     region_buttons = [0, 0, 0, 0]
     log_dir = ""
     logging.basicConfig(filename=(log_dir + "logs.txt"), level=logging.DEBUG, format='%(message)s')
