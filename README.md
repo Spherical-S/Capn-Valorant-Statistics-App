@@ -1,7 +1,7 @@
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Y8Y0C2CAM)
 
 # CAPN - Valorant Statistics App
-Version: 1.0.9
+Version: 1.1.0
 
 CAPN - Valorant Statistics is an application designed to help valorant players find out cool statistics easily. All you have to do is download the app, launch it, and get whatever data you need!
 
@@ -24,14 +24,13 @@ CAPN - Valorant Statistics is an application designed to help valorant players f
 
     <img src="https://cdn.discordapp.com/attachments/481651297817329664/967909046805999647/unknown.png" alt="Match Stats Command" width="500"/> <img src="https://cdn.discordapp.com/attachments/481651297817329664/967909091018145822/unknown.png" alt="Match Stats Command" width="500"/>
     
-  * Match Skins - Find out the skins people in your lobby have equipped, perfect for all you skin whores who want to beg your team for a skin drop (still under development)
+  * Match Skins - Find out the skins people in your lobby have equipped, perfect for all you skin whores who want to beg your team for a skin drop
  
 
 # Current issues/bugs that will be fixed in the next update(s)
 * No known bugs atm, if you find one please contact tiddybite#6304 on discord!
 
 # Upcoming features
-* Match skins command
 * Multi login
 * More stats in match stats (headshot %, winrate %, whos queued with who, and possibly last three games won/lost for everyone in the lobby)
 
