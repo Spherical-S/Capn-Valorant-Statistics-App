@@ -22,7 +22,7 @@ CAPN - Valorant Statistics is an application designed to help valorant players f
     
   * Match Stats - Find out everyone in your current lobbies rank, rr, and peak rank
 
-    <img src="https://cdn.discordapp.com/attachments/481651297817329664/967909046805999647/unknown.png" alt="Match Stats Command" width="500"/> <img src="https://cdn.discordapp.com/attachments/481651297817329664/967909091018145822/unknown.png" alt="Match Stats Command" width="500"/>
+    <img src="https://cdn.discordapp.com/attachments/481651297817329664/967909091018145822/unknown.png" alt="Match Stats Command" width="500"/>
     
   * Match Skins - Find out the skins people in your lobby have equipped, perfect for all you skin whores who want to beg your team for a skin drop
  
