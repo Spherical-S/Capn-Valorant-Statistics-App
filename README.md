@@ -14,17 +14,19 @@ CAPN - Valorant Statistics is an application designed to help valorant players f
 # Current stats available include:
   * Rank - Find out any players rank with just their name and tag
 
-    <img src="https://cdn.discordapp.com/attachments/481651297817329664/967908700394242079/unknown.png" alt="Rank Command" width="500"/>
+    <img src="https://cdn.discordapp.com/attachments/983104809064345640/1010976092145848371/unknown.png" alt="Rank Command" width="500"/>
   
   * Store - Find out whats in your valorant store and your current balance without having to launch valorant
 
-    <img src="https://cdn.discordapp.com/attachments/481651297817329664/967908757877190726/unknown.png" alt="Store Command" width="500"/>
+    <img src="https://cdn.discordapp.com/attachments/983104809064345640/1010978312501330081/unknown.png" alt="Store Command" width="500"/>
     
   * Match Stats - Find out everyone in your current lobbies rank, rr, and peak rank
 
-    <img src="https://cdn.discordapp.com/attachments/481651297817329664/967909091018145822/unknown.png" alt="Match Stats Command" width="500"/>
+    <img src="https://cdn.discordapp.com/attachments/983104809064345640/1010978065687531661/unknown.png" alt="Match Stats Command" width="500"/>
     
   * Match Skins - Find out the skins people in your lobby have equipped, perfect for all you skin whores who want to beg your team for a skin drop
+    
+    <img src="https://cdn.discordapp.com/attachments/983104809064345640/1010979079480164493/unknown.png" alt="Match Stats Command" width="500"/>
  
 
 # Current issues/bugs that will be fixed in the next update(s)
