@@ -39,7 +39,7 @@ def updateSelectedCommand(cmd):
         main_menu[8]['bg'] = PURPLE
         resetArguments()
         args_list.clear()
-        name_entry = Entry(window, font=("Orbitron", 20), fg=BLACK, bg="white", width=12)
+        name_entry = Entry(window, font=("Orbitron", 20), fg=BLACK, bg=PURPLE, width=12)
         args_list.append(name_entry)
         var = StringVar(window)
         temp = ['na', 'eu', 'ap', 'kr']
@@ -228,7 +228,7 @@ def customizeColors():
     f.close()
 
 
-# next 7 definition display the specified commands gui
+# next 9 definition display the specified commands gui
 def displayMainMenu():
     global main_menu
     window.cog = PhotoImage("visualcontent\\cog.png")
@@ -347,6 +347,21 @@ def displayStore():
     region = settings['DEFAULT']['region']
     store = util.getStore(t, en, puuid, region)
     balance = util.getBalance(t, en, puuid, region)
+    if store['status'] != 200:
+        loading_sublabel.destroy()
+        loading_label.destroy()
+        title_label = Label(window, text="Store", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
+        current_menu.append(title_label)  # 0
+        back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, fg=BLACK, command=submitCommand)
+        current_menu.append(back_button)  # 1
+        error_label = Label(window, text="Something went wrong, please try re logging in then try again!", font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
+        current_menu.append(error_label)
+        loading_sublabel.destroy()
+        loading_label.destroy()
+        back_button.place(x=10, y=15)
+        title_label.pack(pady=5)
+        error_label.pack()
+        return
     window.temp = []
     current_skin = 0
     for i in range(len(store['uuids'])):
@@ -369,15 +384,18 @@ def displayStore():
     window.rpimg = ImageTk.PhotoImage(image)
     rp_label = Label(window, text=f": {balance[1]}", font=("Orbitron", 15), bg=PURPLE, fg=BLACK, image=window.rpimg, compound="left")
     current_menu.append(rp_label) #5
-    skin_label = Label(window, text=f"{store['displayNames'][0][:40]}", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, image=window.temp[0], compound="top")
+    skin_label = Label(window, text=f"{store['displayNames'][0][0][:40]}", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, image=window.temp[0], compound="top")
     current_menu.append(skin_label) #6
+    cost_label = Label(window, text=f": {store['displayNames'][0][1]}", font=("Orbitron", 15), bg=PURPLE, fg=BLACK, image=window.vpimg, compound="left")
+    current_menu.append(cost_label)
     loading_sublabel.destroy()
     loading_label.destroy()
     back_button.place(x=10, y=15)
     title_label.pack(pady=5)
     next_button.place(x=795, y=210)
     prev_button.place(x=20, y=210)
-    skin_label.pack(pady=90)
+    skin_label.pack(pady=(90, 10))
+    cost_label.pack()
     vp_label.place(x=300, y=440)
     rp_label.place(x=500, y=440)
 
@@ -634,7 +652,7 @@ def displayMatchSkins():
             var = StringVar(window)
             temp = ['Vandal', 'Phantom', 'Operator', 'Sheriff', 'Ghost',
                     'Classic', 'Spectre', 'Bulldog', 'Odin', 'Ares', 'Guardian',
-                    'Marshal', 'Stinger', 'Bucky', 'Judge', 'Frenzy', 'Shorty']
+                    'Marshal', 'Stinger', 'Bucky', 'Judge', 'Frenzy', 'Shorty', 'Melee']
             var.set(temp[0])
             gun_width = len(max(temp, key=len))
             args_list.append(var)
@@ -678,7 +696,7 @@ def displayMatchSkins():
             var = StringVar(window)
             temp = ['Vandal', 'Phantom', 'Operator', 'Sheriff', 'Ghost',
                     'Classic', 'Spectre', 'Bulldog', 'Odin', 'Ares', 'Guardian',
-                    'Marshal', 'Stinger', 'Bucky', 'Judge', 'Frenzy', 'Shorty']
+                    'Marshal', 'Stinger', 'Bucky', 'Judge', 'Frenzy', 'Shorty', 'Melee']
             var.set(temp[0])
             gun_width = len(max(temp, key=len))
             args_list.append(var)
@@ -751,11 +769,11 @@ def displayLogin():
     current_menu.append(title_label) #0
     username_label = Label(window, text="Username:", font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
     current_menu.append(username_label) #1
-    username_input = Entry(window, font=("Orbitron", 25), fg=BLACK, bg="white", width=15)
+    username_input = Entry(window, font=("Orbitron", 25), fg=BLACK, bg=PURPLE, width=15)
     current_menu.append(username_input) #2
     password_label = Label(window, text="Password:", font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
     current_menu.append(password_label) #3
-    password_input = Entry(window, font=("Orbitron", 25), fg=BLACK, bg="white", width=15, show="*")
+    password_input = Entry(window, font=("Orbitron", 25), fg=BLACK, bg=PURPLE, width=15, show="*")
     current_menu.append(password_input) #4
     enter_button = Button(window, cursor="hand2", text="Enter", command=lambda self=window: login(self), font=("Orbitron", 20), bg=PURPLE)
     current_menu.append(enter_button) #5
@@ -781,8 +799,9 @@ def nextSkin(store):
         current_skin = 0
     else:
         current_skin += 1
-    current_menu[6]['text'] = f"{store['displayNames'][current_skin][:40]}"
+    current_menu[6]['text'] = f"{store['displayNames'][current_skin][0][:40]}"
     current_menu[6]['image'] = f"{window.temp[current_skin]}"
+    current_menu[7]['text'] = f"{store['displayNames'][current_skin][1]}"
 
 
 def prevSkin(store):
@@ -792,9 +811,9 @@ def prevSkin(store):
         current_skin = 3
     else:
         current_skin -= 1
-    current_menu[6]['text'] = f"{store['displayNames'][current_skin][:40]}"
+    current_menu[6]['text'] = f"{store['displayNames'][current_skin][0][:40]}"
     current_menu[6]['image'] = f"{window.temp[current_skin]}"
-
+    current_menu[7]['text'] = f"{store['displayNames'][current_skin][1]}"
 
 # switches the display between teams for matchStats
 def nextTeam():
@@ -918,7 +937,7 @@ try: # Put it all in a try... except to catch all errors and log them
     settings.read('settings.ini')
     PURPLE = settings['DEFAULT']['bg']
     BLACK = settings['DEFAULT']['fg']
-    current_version = "1.1.0"
+    current_version = "1.1.1"
     region = ""
     enc_key = "0"
     selected_command = 0

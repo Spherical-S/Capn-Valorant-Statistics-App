@@ -17,7 +17,7 @@ weaponsDictionary = {}
 mStatsOutput = []
 mSkinsOutput = {}
 lock = Lock()
-key = "Private" #Cant make my api key public!
+key = "Hidden" #not leaking my api key he he he haw (clash royale king laugh)
 
 
 def internet():
@@ -297,26 +297,45 @@ def getSkins():
                     weaponsDictionary[y['data'][i]['skins'][n]['levels'][l]['uuid']] = y['data'][i]['skins'][n]['displayName']
 
 
+def getPrices(t, en, region):
+    url = f'https://pd.{region}.a.pvp.net/store/v1/offers/'
+    headers = {
+        'X-Riot-Entitlements-JWT': en,
+        'Authorization': f'Bearer {t}'
+    }
+    r = get(url, headers=headers)
+    y = r.json()
+    prices = {}
+    for i in range(len(y['Offers'])):
+        prices[y['Offers'][i]['Rewards'][0]['ItemID']] = y['Offers'][i]['Cost']['85ad13f7-3d1b-5128-9eb2-7cd8ee0b5741']
+    return prices
+
+
 # Retrieves the users store
 def getStore(t, en, puuid, region):
     getSkins()
+    prices = getPrices(t, en, region)
     url = f'https://pd.{region}.a.pvp.net/store/v2/storefront/{puuid}'
     headers = {
         'X-Riot-Entitlements-JWT': en,
         'Authorization': f'Bearer {t}'
     }
     r = get(url, headers=headers)
-    singleItems = ['', '', '', '']
+    singleItems = [['', ''], ['', ''], ['', ''], ['', '']]
     if str(r.status_code) == "200":
         y = r.json()
-        singleItems[0] = weaponsDictionary[y['SkinsPanelLayout']['SingleItemOffers'][0]]
-        singleItems[1] = weaponsDictionary[y['SkinsPanelLayout']['SingleItemOffers'][1]]
-        singleItems[2] = weaponsDictionary[y['SkinsPanelLayout']['SingleItemOffers'][2]]
-        singleItems[3] = weaponsDictionary[y['SkinsPanelLayout']['SingleItemOffers'][3]]
-        output = {'uuids': [y['SkinsPanelLayout']['SingleItemOffers'][0], y['SkinsPanelLayout']['SingleItemOffers'][1], y['SkinsPanelLayout']['SingleItemOffers'][2], y['SkinsPanelLayout']['SingleItemOffers'][3]], 'displayNames': [singleItems[0], singleItems[1], singleItems[2], singleItems[3]], "Message": ""}
+        singleItems[0][0] = weaponsDictionary[y['SkinsPanelLayout']['SingleItemOffers'][0]]
+        singleItems[1][0] = weaponsDictionary[y['SkinsPanelLayout']['SingleItemOffers'][1]]
+        singleItems[2][0] = weaponsDictionary[y['SkinsPanelLayout']['SingleItemOffers'][2]]
+        singleItems[3][0] = weaponsDictionary[y['SkinsPanelLayout']['SingleItemOffers'][3]]
+        singleItems[0][1] = prices[y['SkinsPanelLayout']['SingleItemOffers'][0]]
+        singleItems[1][1] = prices[y['SkinsPanelLayout']['SingleItemOffers'][1]]
+        singleItems[2][1] = prices[y['SkinsPanelLayout']['SingleItemOffers'][2]]
+        singleItems[3][1] = prices[y['SkinsPanelLayout']['SingleItemOffers'][3]]
+        output = {'status': 200, 'uuids': [y['SkinsPanelLayout']['SingleItemOffers'][0], y['SkinsPanelLayout']['SingleItemOffers'][1], y['SkinsPanelLayout']['SingleItemOffers'][2], y['SkinsPanelLayout']['SingleItemOffers'][3]], 'displayNames': [singleItems[0], singleItems[1], singleItems[2], singleItems[3]], "Message": ""}
         return output
     else:
-        output = {'uuids': ["-1", "-1", "-1", "-1"], "displayNames": ["Error", "Error", "Error", "Error"], "Message": "Couldn't retrieve store, try again later."}
+        output = {'status': -1}
         return output
 
 
@@ -581,8 +600,6 @@ def matchSkins(t, en, puuid, region):
         mSkinsOutput = {'status': -1}
         return mSkinsOutput
     if matchInfo[1] != "post":
-        url = f"https://glz-{region}-1.{region}.a.pvp.net/pregame/v1/matches/{matchid}/loadouts"
-        url2 = f"https://glz-{region}-1.{region}.a.pvp.net/pregame/v1/matches/{matchid}"
         return {'status': -2}
     else:
         url = f'https://glz-{region}-1.{region}.a.pvp.net/core-game/v1/matches/{matchid}/loadouts'
