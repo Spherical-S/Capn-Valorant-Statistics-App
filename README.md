@@ -11,7 +11,7 @@ CAPN - Valorant Statistics is an application designed to help valorant players f
 * You must run Capn with **administrator priveliges** or it may not work!
 * All sensitive data is encrypted and stored on your local machine. It is your job to keep that information safe!
 
-# Current stats available include:
+# Current Features available include:
   * Rank - Find out any players rank with just their name and tag
 
     <img src="https://cdn.discordapp.com/attachments/983104809064345640/1010976092145848371/unknown.png" alt="Rank Command" width="500"/>
@@ -27,13 +27,14 @@ CAPN - Valorant Statistics is an application designed to help valorant players f
   * Match Skins - Find out the skins people in your lobby have equipped, perfect for all you skin whores who want to beg your team for a skin drop
     
     <img src="https://cdn.discordapp.com/attachments/983104809064345640/1010979079480164493/unknown.png" alt="Match Stats Command" width="500"/>
+    
+  * Switch logins - Easily switch between 5 different accounts without having to type in the username and password everytime. Great for those with multiple accounts!
  
 
 # Current issues/bugs that will be fixed in the next update(s)
 * No known bugs atm, if you find one please contact tiddybite#6304 on discord!
 
 # Upcoming features
-* Multi login
 * More stats in match stats (headshot %, winrate %, whos queued with who, and possibly last three games won/lost for everyone in the lobby)
 
 # Credits and support
