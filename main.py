@@ -46,7 +46,7 @@ def updateSelectedCommand(cmd):
         var.set(temp[0])
         args_list.append(var)
         region_select = OptionMenu(window, var, *temp)
-        region_select.config(bg=PURPLE, font=("Orbitron", 12), highlightthickness=0)
+        region_select.config(bg=PURPLE, fg=BLACK, font=("Orbitron", 12), highlightthickness=0)
         args_list.append(region_select)
         temp.clear()
         temp.append('current')
@@ -56,11 +56,11 @@ def updateSelectedCommand(cmd):
         var1.set(temp[0])
         args_list.append(var1)
         act_select = OptionMenu(window, var1, *temp)
-        act_select.config(bg=PURPLE, font=("Orbitron", 12), highlightthickness=0)
+        act_select.config(bg=PURPLE, fg=BLACK, font=("Orbitron", 12), highlightthickness=0)
         args_list.append(act_select)
-        name_label = Label(window, text="Name#Tag:", font=("Orbitron", 12), bg=PURPLE)
-        region_label = Label(window, text="Region:", font=("Orbitron", 12), bg=PURPLE)
-        act_label = Label(window, text="Act:", font=("Orbitron", 12), bg=PURPLE)
+        name_label = Label(window, text="Name#Tag:", font=("Orbitron", 12), bg=PURPLE, fg=BLACK)
+        region_label = Label(window, text="Region:", font=("Orbitron", 12), bg=PURPLE, fg=BLACK)
+        act_label = Label(window, text="Act:", font=("Orbitron", 12), bg=PURPLE, fg=BLACK)
         args_list.append(name_label)
         args_list.append(region_label)
         args_list.append(act_label)
@@ -183,7 +183,7 @@ def submitCommand():
         elif selected_command == 5:
             selected_command = -1
             destroyMainMenu()
-            displayLogout()
+            displaySwitch()
             return
         elif selected_command == 6:
             selected_command = -1
@@ -192,7 +192,10 @@ def submitCommand():
             return
         else:
             for i in range(len(current_menu)):
-                current_menu[i].destroy()
+                try:
+                    current_menu[i].destroy()
+                except:
+                    pass
             current_menu.clear()
             displayMainMenu()
 
@@ -228,10 +231,54 @@ def customizeColors():
     f.close()
 
 
+#logs user out
+def logout():
+    global logins_check
+    global region_buttons
+    settings.read('settings.ini')
+    for i in range(len(current_menu)):
+        try:
+            current_menu[i].destroy()
+        except AttributeError:
+            pass
+    current_menu.clear()
+    window.unbind('<Return>')
+    settings['DEFAULT']['username'] = ""
+    settings['DEFAULT']['password'] = ""
+    settings['DEFAULT']['region'] = ""
+    settings['DEFAULT']['token'] = ""
+    settings['DEFAULT']['entitlement'] = ""
+    settings['DEFAULT']['puuid'] = ""
+    settings['DEFAULT']['mfa'] = ""
+    settings['DEFAULT']['expiry'] = ""
+    profile = f"ACCOUNT{settings['DEFAULT']['profile']}"
+    settings[profile]['username'] = ""
+    settings[profile]['password'] = ""
+    settings[profile]['region'] = ""
+    f = open("settings.ini", "w")
+    settings.write(f)
+    f.close()
+    settings.read('settings.ini')
+    window.bind("<Return>", login)
+    region_buttons = []
+    displayLogin()
+    b1 = Button(window, cursor="hand2", text="NA", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, command=lambda num=0: selectRegion(num))
+    b2 = Button(window, cursor="hand2", text="EU", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, command=lambda num=1: selectRegion(num))
+    b3 = Button(window, cursor="hand2", text="AP", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, command=lambda num=2: selectRegion(num))
+    b4 = Button(window, cursor="hand2", text="KR", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, command=lambda num=3: selectRegion(num))
+    region_buttons.append(b1)
+    region_buttons.append(b2)
+    region_buttons.append(b3)
+    region_buttons.append(b4)
+    b1.place(x=170, y=300)
+    b2.place(x=320, y=300)
+    b3.place(x=470, y=300)
+    b4.place(x=620, y=300)
+
+
 # next 9 definition display the specified commands gui
 def displayMainMenu():
     global main_menu
-    window.cog = PhotoImage("visualcontent\\cog.png")
     window.bind('<Return>', lambda event: submitCommand())
     main_menu.clear()
     title_label = Label(window, text="Aye Aye Capn!", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
@@ -244,8 +291,8 @@ def displayMainMenu():
     main_menu.append(match_stats_button) #3
     match_skins_button = Button(window, cursor="hand2", text="Match Skins", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, width=10, command=lambda: updateSelectedCommand(4))
     main_menu.append(match_skins_button) #4
-    logout_button = Button(window, cursor="hand2", text="Logout", font=("Orbitron", 20), bg=PURPLE, fg=BLACK, width=10, command=lambda: updateSelectedCommand(5))
-    main_menu.append(logout_button) #5
+    switch_button = Button(window, cursor="hand2", text="Switch Login", font=("Orbitron", 20), bg=PURPLE, fg=BLACK, width=10, command=lambda: updateSelectedCommand(5))
+    main_menu.append(switch_button) #5
     submit_button = Button(window, cursor="hand2", text="Submit", font=("Orbitron", 20), bg=PURPLE, fg=BLACK, width=5, command=submitCommand)
     main_menu.append(submit_button) #6
     error_label = Label(window, text="", bg=PURPLE, fg="red", font=("Orbitron", 15))
@@ -263,7 +310,7 @@ def displayMainMenu():
     store_button.place(x=345, y=85)
     match_skins_button.place(x=70, y=250)
     match_stats_button.place(x=620, y=85)
-    logout_button.place(x=345, y=250)
+    switch_button.place(x=345, y=250)
     help_button.place(x=620, y=250)
     submit_button.place(x=395, y=430)
     error_label.pack(pady=50)
@@ -281,9 +328,12 @@ def displaySettings():
     current_menu.append(back_button)  # 1
     color_button = Button(window, cursor="hand2", text="Customize colors", font=("Orbitron", 20), bg=PURPLE, fg=BLACK, width=14, command=customizeColors)
     current_menu.append(color_button)
+    logout_button = Button(window, cursor="hand2", text="Logout", font=("Orbitron", 20), bg=PURPLE, fg=BLACK, width=14, command=logout)
+    current_menu.append(logout_button)
     back_button.place(x=10, y=15)
     title_label.pack(pady=5)
     color_button.place(x=310, y=180)
+    logout_button.place(x=310, y=250)
 
 
 def displayRankMenu(player, tag, region, act):
@@ -370,9 +420,9 @@ def displayStore():
     current_menu.append(title_label)  #0
     back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, fg=BLACK, command=submitCommand)
     current_menu.append(back_button)  #1
-    next_button = Button(window, cursor="hand2", text="-->", font=("Orbitron", 25), bg=PURPLE, command=lambda store=store: nextSkin(store))
+    next_button = Button(window, cursor="hand2", text="-->", font=("Orbitron", 25), bg=PURPLE, fg=BLACK, command=lambda store=store: nextSkin(store))
     current_menu.append(next_button) #2
-    prev_button = Button(window, cursor="hand2", text="<--", font=("Orbitron", 25), bg=PURPLE, command=lambda store=store: prevSkin(store))
+    prev_button = Button(window, cursor="hand2", text="<--", font=("Orbitron", 25), bg=PURPLE, fg=BLACK, command=lambda store=store: prevSkin(store))
     current_menu.append(prev_button) #3
     image = Image.open(f"visualcontent\\vp.png")
     image = image.resize((40, 40))
@@ -501,9 +551,9 @@ def displayMatchStats():
             current_menu.append(title_label)  # 0
             back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, fg=BLACK, command=submitCommand)
             current_menu.append(back_button)  # 1
-            next_button = Button(window, cursor="hand2", text="-->", font=("Orbitron", 25), bg=PURPLE, command=nextTeam)
+            next_button = Button(window, cursor="hand2", text="-->", fg=BLACK, font=("Orbitron", 25), bg=PURPLE, command=nextTeam)
             current_menu.append(next_button)  # 2
-            prev_button = Button(window, cursor="hand2", text="<--", font=("Orbitron", 25), bg=PURPLE, command=nextTeam)
+            prev_button = Button(window, cursor="hand2", text="<--", fg=BLACK, font=("Orbitron", 25), bg=PURPLE, command=nextTeam)
             current_menu.append(prev_button)  # 3
             team_label = Label(window, text=displayData['currentTeam']+" Team", font=("Orbitron", 20), fg=BLACK, bg=PURPLE)
             current_menu.append(team_label) # 4
@@ -583,7 +633,7 @@ def displayMatchSkins():
     util.internet()
     loading_label = Label(window, text="Loading...", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
     loading_label.pack()
-    loading_sublabel = Label(window, text="Please wait while your match stats are being fetched", font=("Orbitron", 15),fg=BLACK, bg=PURPLE)
+    loading_sublabel = Label(window, text="Please wait while your match skins are being fetched", font=("Orbitron", 15),fg=BLACK, bg=PURPLE)
     loading_sublabel.pack()
     window.update()
     t = decrypt(settings['DEFAULT']['token'], enc_key)
@@ -637,13 +687,13 @@ def displayMatchSkins():
             for i in range(len(output['redTeam'])):
                 displayData['redNames'] += f"{output['redTeam'][i]['name'][:12]}\n({output['redTeam'][i]['agent']})\n"
                 displayData['redSkins'] += output['redTeam'][i]['skins']['Vandal'][:30] + "\n\n"
-            title_label = Label(window, text="Match Stats", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
+            title_label = Label(window, text="Match Skins", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
             current_menu.append(title_label)  # 0
             back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, fg=BLACK, command=submitCommand)
             current_menu.append(back_button)  # 1
-            next_button = Button(window, cursor="hand2", text="-->", font=("Orbitron", 25), bg=PURPLE, command=nextTeamSkins)
+            next_button = Button(window, cursor="hand2", text="-->", fg=BLACK, font=("Orbitron", 25), bg=PURPLE, command=nextTeamSkins)
             current_menu.append(next_button)  # 2
-            prev_button = Button(window, cursor="hand2", text="<--", font=("Orbitron", 25), bg=PURPLE, command=nextTeamSkins)
+            prev_button = Button(window, cursor="hand2", text="<--", fg=BLACK, font=("Orbitron", 25), bg=PURPLE, command=nextTeamSkins)
             current_menu.append(prev_button)  # 3
             team_label = Label(window, text=displayData['currentTeam'] + " Team", font=("Orbitron", 20), fg=BLACK, bg=PURPLE)
             current_menu.append(team_label)  # 4
@@ -655,9 +705,8 @@ def displayMatchSkins():
                     'Marshal', 'Stinger', 'Bucky', 'Judge', 'Frenzy', 'Shorty', 'Melee']
             var.set(temp[0])
             gun_width = len(max(temp, key=len))
-            args_list.append(var)
             gun_select = OptionMenu(window, var, *temp, command=changeGun)
-            gun_select.config(bg=PURPLE, font=("Orbitron", 12), highlightthickness=0, width=gun_width)
+            gun_select.config(bg=PURPLE, fg=BLACK, font=("Orbitron", 12), highlightthickness=0, width=gun_width)
             current_menu.append(gun_select)  # 6
             skins_label = Label(window, text=displayData['blueSkins'], font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
             current_menu.append(skins_label)  # 7
@@ -699,9 +748,8 @@ def displayMatchSkins():
                     'Marshal', 'Stinger', 'Bucky', 'Judge', 'Frenzy', 'Shorty', 'Melee']
             var.set(temp[0])
             gun_width = len(max(temp, key=len))
-            args_list.append(var)
             gun_select = OptionMenu(top_frame, var, *temp, command=changeGun)
-            gun_select.config(bg=PURPLE, font=("Orbitron", 12), highlightthickness=0, width=gun_width)
+            gun_select.config(bg=PURPLE, fg=BLACK, font=("Orbitron", 12), highlightthickness=0, width=gun_width)
             gun_select.grid(row=0, column=2)
             canvas = Canvas(bottom_frame, height=365, width=885, bg=PURPLE, highlightthickness=0)
             canvas.grid(row=0, column=0)
@@ -718,32 +766,45 @@ def displayMatchSkins():
             current_menu.append(skins_label) #2
 
 
-def displayLogout():
-    global region_buttons
-    global logins_check
+def displaySwitch():
     window.unbind('<Return>')
-    settings['DEFAULT']['username'] = ""
-    settings['DEFAULT']['password'] = ""
-    settings['DEFAULT']['region'] = ""
-    settings['DEFAULT']['token'] = ""
-    settings['DEFAULT']['entitlement'] = ""
-    settings['DEFAULT']['puuid'] = ""
-    settings['DEFAULT']['mfa'] = ""
-    settings['DEFAULT']['expiry'] = ""
-    f = open("settings.ini", "w")
-    settings.write(f)
-    f.close()
-    window.bind("<Return>", login)
-    region_buttons = [0, 0, 0, 0]
-    displayLogin()
-    region_buttons[0] = Button(window, cursor="hand2", text="NA", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, command=lambda num=0: selectRegion(num))
-    region_buttons[1] = Button(window, cursor="hand2", text="EU", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, command=lambda num=1: selectRegion(num))
-    region_buttons[2] = Button(window, cursor="hand2", text="AP", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, command=lambda num=2: selectRegion(num))
-    region_buttons[3] = Button(window, cursor="hand2", text="KR", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, command=lambda num=3: selectRegion(num))
-    region_buttons[0].place(x=170, y=300)
-    region_buttons[1].place(x=320, y=300)
-    region_buttons[2].place(x=470, y=300)
-    region_buttons[3].place(x=620, y=300)
+    util.internet()
+    alts = getAlts()
+    current = alts[alts['current']]['username']
+    title_label = Label(window, text="Switch Accounts", font=("Orbitron", 25), fg=BLACK, bg=PURPLE)
+    current_menu.append(title_label)  #0
+    back_button = Button(window, cursor="hand2", text="Back", font=("Orbitron", 15), bg=PURPLE, fg=BLACK, command=submitCommand)
+    current_menu.append(back_button)  #1
+    alts_label = Label(window, text=f"=======================\nAccount A: {alts['A']['username'][:12]}\nAccount B: {alts['B']['username'][:12]}\nAccount C: {alts['C']['username'][:12]}\nAccount D: {alts['D']['username'][:12]}\nAccount E: {alts['E']['username'][:12]}\n\nCurrent: {current[:12]} ({alts['current']})", font=("Orbitron", 20), fg=BLACK, bg=PURPLE)
+    current_menu.append(alts_label) #2
+    var = StringVar(window)
+    temp = []
+    if 'A' != alts['current']:
+        temp.append(f"A: {alts['A']['username'][:12]}")
+    if 'B' != alts['current']:
+        temp.append(f"B: {alts['B']['username'][:12]}")
+    if 'C' != alts['current']:
+        temp.append(f"C: {alts['C']['username'][:12]}")
+    if 'D' != alts['current']:
+        temp.append(f"D: {alts['D']['username'][:12]}")
+    if 'E' != alts['current']:
+        temp.append(f"E: {alts['E']['username'][:12]}")
+    var.set(temp[0])
+    switch_width = len(max(temp, key=len))
+    switch_select = OptionMenu(window, var, *temp)
+    switch_select.config(bg=PURPLE, fg=BLACK, font=("Orbitron", 12), highlightthickness=0, width=switch_width)
+    current_menu.append(var) #3
+    current_menu.append(switch_select) #4
+    enter_button = Button(window, cursor="hand2", text="Enter", font=("Orbitron", 15), bg=PURPLE, fg=BLACK, command=switchLogin)
+    current_menu.append(enter_button) #5
+    error_label = Label(window, text="", font=('Orbitron', 18), fg=BLACK, bg=PURPLE,)
+    current_menu.append(error_label) #6
+    title_label.pack(pady=5)
+    back_button.place(x=10, y=15)
+    alts_label.pack()
+    switch_select.pack()
+    enter_button.pack(side="bottom", pady=5)
+    error_label.pack(side="bottom")
 
 
 def displayHelp():
@@ -775,7 +836,7 @@ def displayLogin():
     current_menu.append(password_label) #3
     password_input = Entry(window, font=("Orbitron", 25), fg=BLACK, bg=PURPLE, width=15, show="*")
     current_menu.append(password_input) #4
-    enter_button = Button(window, cursor="hand2", text="Enter", command=lambda self=window: login(self), font=("Orbitron", 20), bg=PURPLE)
+    enter_button = Button(window, cursor="hand2", text="Enter", command=lambda self=window: login(self), font=("Orbitron", 20), bg=PURPLE, fg=BLACK)
     current_menu.append(enter_button) #5
     region_label = Label(window, text="Select a region:", font=("Orbitron", 15), fg=BLACK, bg=PURPLE)
     current_menu.append(region_label) #6
@@ -874,10 +935,91 @@ def changeGun(newGun):
         current_menu[2]['text'] = displayData['playerSkins']
 
 
+def getAlts():
+    settings.read('settings.ini')
+    alts = {"A": {"username": "Empty", "password": "", "region": "", "current": 0}, "B": {"username": "Empty", "password": "", "region": "", "current": 0}, "C": {"username": "Empty", "password": "", "region": "", "current": 0}, "D": {"username": "Empty", "password": "", "region": "", "current": 0}, "E": {"username": "Empty", "password": "", "region": "", "current": 0}, "current": ""}
+    if settings['ACCOUNTA']['username'] != "":
+        if decrypt(settings['ACCOUNTA']['username'], enc_key) == decrypt(settings['DEFAULT']['username'], enc_key):
+            alts["A"]["current"] = 1
+        alts["A"]["username"] = decrypt(settings['ACCOUNTA']['username'], enc_key)
+        alts["A"]["password"] = settings['ACCOUNTA']['password']
+        alts["A"]["region"] = settings['ACCOUNTA']['region']
+    if settings['ACCOUNTB']['username'] != "":
+        if decrypt(settings['ACCOUNTB']['username'], enc_key) == decrypt(settings['DEFAULT']['username'], enc_key):
+            alts["B"]["current"] = 1
+        alts["B"]["username"] = decrypt(settings['ACCOUNTB']['username'], enc_key)
+        alts["B"]["password"] = settings['ACCOUNTB']['password']
+        alts["B"]["region"] = settings['ACCOUNTB']['region']
+    if settings['ACCOUNTC']['username'] != "":
+        if decrypt(settings['ACCOUNTC']['username'], enc_key) == decrypt(settings['DEFAULT']['username'], enc_key):
+            alts["C"]["current"] = 1
+        alts["C"]["username"] = decrypt(settings['ACCOUNTC']['username'], enc_key)
+        alts["C"]["password"] = settings['ACCOUNTC']['password']
+        alts["C"]["region"] = settings['ACCOUNTC']['region']
+    if settings['ACCOUNTD']['username'] != "":
+        if decrypt(settings['ACCOUNTD']['username'], enc_key) == decrypt(settings['DEFAULT']['username'], enc_key):
+            alts["D"]["current"] = 1
+        alts["D"]["username"] = decrypt(settings['ACCOUNTD']['username'], enc_key)
+        alts["D"]["password"] = settings['ACCOUNTD']['password']
+        alts["D"]["region"] = settings['ACCOUNTD']['region']
+    if settings['ACCOUNTE']['username'] != "":
+        if decrypt(settings['ACCOUNTE']['username'], enc_key) == decrypt(settings['DEFAULT']['username'], enc_key):
+            alts["E"]["current"] = 1
+        alts["E"]["username"] = decrypt(settings['ACCOUNTE']['username'], enc_key)
+        alts["E"]["password"] = settings['ACCOUNTE']['password']
+        alts["E"]["region"] = settings['ACCOUNTE']['region']
+    alts['current'] = settings['DEFAULT']['profile']
+    return alts
+
+
+def switchLogin():
+    current_menu[6]['text'] = "Checking account profile! please wait!"
+    window.update()
+    alts = getAlts()
+    selection = current_menu[3].get()[0:1]
+    settings['DEFAULT']['profile'] = selection
+    f = open("settings.ini", "w")
+    settings.write(f)
+    f.close()
+    settings.read('settings.ini')
+    # if alts[selection]['username'] == "Empty":
+    #     logout()
+    profile = f"ACCOUNT{selection}"
+    username = decrypt(settings[profile]['username'], enc_key)
+    password = decrypt(settings[profile]['password'], enc_key)
+    authorization = getAuth(username, password)
+    if authorization[0] == "-1":
+        logout()
+    else:
+        settings.read('settings.ini')
+        profile = f"ACCOUNT{settings['DEFAULT']['profile']}"
+        settings['DEFAULT']['username'] = encrypt(username, enc_key)
+        settings['DEFAULT']['password'] = encrypt(password, enc_key)
+        settings['DEFAULT']['region'] = settings[profile]['region']
+        settings['DEFAULT']['expiry'] = "0"
+        if settings['DEFAULT']['mfa'] == "1":
+            now = datetime.now()
+            exp = int(now.strftime("%Y%m%d%H%M%S"))
+            exp += 10000
+            settings['DEFAULT']['expiry'] = str(exp)
+        f = open("settings.ini", "w")
+        settings.write(f)
+        f.close()
+        for i in current_menu:
+            try:
+                i.destroy()
+            except AttributeError:
+                pass
+        current_menu.clear()
+        settings.read('settings.ini')
+        region = settings[profile]['region']
+        displayMainMenu()
+
+
+
 # updates the colour of the region buttons depending on which one is selected
 def selectRegion(regionNum):
     global region
-    global region_buttons
     for i in range(4):
         if i == regionNum:
             region_buttons[i]['bg'] = "green"
@@ -896,6 +1038,7 @@ def selectRegion(regionNum):
 # sends api call to log in, then writes it into settings.ini
 def login(self):
     global region
+    global region_buttons
     logging.info('made it into login()')
     current_menu[7]['text'] = "Checking logins, please wait!"
     window.update()
@@ -909,10 +1052,16 @@ def login(self):
         if authorization[0] == "-1":
             current_menu[7]['text'] = "Invalid logins!"
         else:
+            region_buttons[0].destroy()
+            region_buttons[1].destroy()
+            region_buttons[2].destroy()
+            region_buttons[3].destroy()
+            profile = f"ACCOUNT{settings['DEFAULT']['profile']}"
             settings['DEFAULT']['username'] = encrypt(username, enc_key)
             settings['DEFAULT']['password'] = encrypt(password, enc_key)
             settings['DEFAULT']['region'] = region
             settings['DEFAULT']['expiry'] = "0"
+            settings[profile]['region'] = region
             if settings['DEFAULT']['mfa'] == "1":
                 now = datetime.now()
                 exp = int(now.strftime("%Y%m%d%H%M%S"))
@@ -922,8 +1071,6 @@ def login(self):
             settings.write(f)
             f.close()
             for i in current_menu:
-                i.destroy()
-            for i in region_buttons:
                 i.destroy()
             region_buttons.clear()
             current_menu.clear()
@@ -937,7 +1084,7 @@ try: # Put it all in a try... except to catch all errors and log them
     settings.read('settings.ini')
     PURPLE = settings['DEFAULT']['bg']
     BLACK = settings['DEFAULT']['fg']
-    current_version = "1.1.1"
+    current_version = "1.1.2"
     region = ""
     enc_key = "0"
     selected_command = 0
@@ -950,7 +1097,7 @@ try: # Put it all in a try... except to catch all errors and log them
     current_skin = 0
     displayData = {}
     mSkinsOutput = {}
-    region_buttons = [0, 0, 0, 0]
+    region_buttons = []
     log_dir = ""
     logging.basicConfig(filename=(log_dir + "logs.txt"), level=logging.DEBUG, format='%(message)s')
     f = open('logs.txt', 'w')
@@ -1012,14 +1159,18 @@ try: # Put it all in a try... except to catch all errors and log them
         f.close()
         window.bind("<Return>", login)
         displayLogin()
-        region_buttons[0] = Button(window, cursor="hand2", text="NA", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, command=lambda num=0: selectRegion(num))
-        region_buttons[1] = Button(window, cursor="hand2", text="EU", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, command=lambda num=1: selectRegion(num))
-        region_buttons[2] = Button(window, cursor="hand2", text="AP", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, command=lambda num=2: selectRegion(num))
-        region_buttons[3] = Button(window, cursor="hand2", text="KR", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, command=lambda num=3: selectRegion(num))
-        region_buttons[0].place(x=170, y=300)
-        region_buttons[1].place(x=320, y=300)
-        region_buttons[2].place(x=470, y=300)
-        region_buttons[3].place(x=620, y=300)
+        b1 = Button(window, cursor="hand2", text="NA", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, command=lambda num=0: selectRegion(num))
+        b2 = Button(window, cursor="hand2", text="EU", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, command=lambda num=1: selectRegion(num))
+        b3 = Button(window, cursor="hand2", text="AP", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, command=lambda num=2: selectRegion(num))
+        b4 = Button(window, cursor="hand2", text="KR", font=("Orbitron", 20), fg=BLACK, bg=PURPLE, command=lambda num=3: selectRegion(num))
+        region_buttons.append(b1)
+        region_buttons.append(b2)
+        region_buttons.append(b3)
+        region_buttons.append(b4)
+        b1.place(x=170, y=300)
+        b2.place(x=320, y=300)
+        b3.place(x=470, y=300)
+        b4.place(x=620, y=300)
 
     mainloop()
 except Exception as e:

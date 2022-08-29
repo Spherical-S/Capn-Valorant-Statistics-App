@@ -117,6 +117,9 @@ def getAuth(username, password):
     settings['DEFAULT']['entitlement'] = encrypt(entitlement, enc_key)
     settings['DEFAULT']['puuid'] = puuid
     settings['DEFAULT']['mfa'] = mfa
+    profile = f"ACCOUNT{settings['DEFAULT']['profile']}"
+    settings[profile]['username'] = encrypt(username, enc_key)
+    settings[profile]['password'] = encrypt(password, enc_key)
     f = open('settings.ini', 'w')
     settings.write(f)
     f.close()
