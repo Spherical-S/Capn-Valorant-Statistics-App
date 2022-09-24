@@ -578,6 +578,8 @@ def displayMatchStats():
             peaks_label.place(x=530, y=120)
             peakSeasons_label.place(x=710, y=120)
         else:
+            for i in range(len(output['players'])):
+                print(output['players'][i]['stats'])
             loading_sublabel.destroy()
             loading_label.destroy()
             displayData = {}
@@ -1084,7 +1086,7 @@ try: # Put it all in a try... except to catch all errors and log them
     settings.read('settings.ini')
     PURPLE = settings['DEFAULT']['bg']
     BLACK = settings['DEFAULT']['fg']
-    current_version = "1.1.2"
+    current_version = "1.1.3"
     region = ""
     enc_key = "0"
     selected_command = 0

@@ -52,7 +52,7 @@ def getAuth(username, password):
     headers = OrderedDict({
         "Accept-Language": "en-US,en;q=0.9",
         "Accept": "application/json, text/plain, */*",
-        'User-Agent': 'RiotClient/51.0.0.4429735.4381201 rso-auth (Windows;10;;Professional, x64)'
+        'User-Agent': "RiotClient/56.0.0.4578455.4552318 rso-auth (Windows;10;;Professional, x64)"
     })
     session = sesh()
     session.headers = headers
@@ -66,7 +66,7 @@ def getAuth(username, password):
     }
     headers = {
         'Content-Type': 'application/json',
-        'User-Agent': 'RiotClient/51.0.0.4429735.4381201 rso-auth (Windows;10;;Professional, x64)',
+        'User-Agent': "RiotClient/56.0.0.4578455.4552318 rso-auth (Windows;10;;Professional, x64)",
     }
     r = session.post(f'https://auth.riotgames.com/api/v1/authorization', json=data, headers=headers)
     data = {
@@ -102,7 +102,7 @@ def getAuth(username, password):
     token = data[0]
 
     headers = {
-        'User-Agent': 'RiotClient/51.0.0.4429735.4381201 rso-auth (Windows;10;;Professional, x64)',
+        'User-Agent': 'RiotClient/56.0.0.4578455.4552318 rso-auth (Windows;10;;Professional, x64)',
         'Authorization': f'Bearer {token}',
     }
     r = session.post('https://entitlements.auth.riotgames.com/api/token/v1', headers=headers, json={})
