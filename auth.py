@@ -12,6 +12,7 @@ from cryptocode import decrypt, encrypt
 from datetime import datetime
 from configparser import ConfigParser
 
+riotclient = "RiotClient/58.0.1.4719464.4552318 rso-auth (Windows;10;;Professional, x64)"
 
 class TLSAdapter(HTTPAdapter):
     def init_poolmanager(self, connections, maxsize, block=False):
@@ -52,7 +53,7 @@ def getAuth(username, password):
     headers = OrderedDict({
         "Accept-Language": "en-US,en;q=0.9",
         "Accept": "application/json, text/plain, */*",
-        'User-Agent': "RiotClient/56.0.0.4578455.4552318 rso-auth (Windows;10;;Professional, x64)"
+        'User-Agent': riotclient
     })
     session = sesh()
     session.headers = headers
@@ -66,7 +67,7 @@ def getAuth(username, password):
     }
     headers = {
         'Content-Type': 'application/json',
-        'User-Agent': "RiotClient/56.0.0.4578455.4552318 rso-auth (Windows;10;;Professional, x64)",
+        'User-Agent': riotclient,
     }
     r = session.post(f'https://auth.riotgames.com/api/v1/authorization', json=data, headers=headers)
     data = {
@@ -102,7 +103,7 @@ def getAuth(username, password):
     token = data[0]
 
     headers = {
-        'User-Agent': 'RiotClient/56.0.0.4578455.4552318 rso-auth (Windows;10;;Professional, x64)',
+        'User-Agent': riotclient,
         'Authorization': f'Bearer {token}',
     }
     r = session.post('https://entitlements.auth.riotgames.com/api/token/v1', headers=headers, json={})
