@@ -1,22 +1,41 @@
 from requests import session as sesh
 from requests.adapters import HTTPAdapter
-from ssl import PROTOCOL_TLSv1_2
-from urllib3 import PoolManager
-from tkinter import *
+from requests.packages.urllib3.util.ssl_ import create_urllib3_context
 from collections import OrderedDict
 from re import compile
-from json import load
 from time import sleep
 from os import startfile
 from cryptocode import decrypt, encrypt
 from datetime import datetime
 from configparser import ConfigParser
 
-riotclient = "RiotClient/58.0.1.4719464.4552318 rso-auth (Windows;10;;Professional, x64)"
+CIPHERS = [
+    'ECDHE-ECDSA-AES256-GCM-SHA384',
+    'ECDHE-ECDSA-AES128-GCM-SHA256',
+    'ECDHE-ECDSA-CHACHA20-POLY1305',
+    'ECDHE-RSA-AES128-GCM-SHA256',
+    'ECDHE-RSA-CHACHA20-POLY1305',
+    'ECDHE-RSA-AES128-SHA256',
+    'ECDHE-RSA-AES128-SHA',
+    'ECDHE-RSA-AES256-SHA',
+    'ECDHE-ECDSA-AES128-SHA256',
+    'ECDHE-ECDSA-AES128-SHA',
+    'ECDHE-ECDSA-AES256-SHA',
+    'ECDHE+AES128',
+    'ECDHE+AES256',
+    'ECDHE+3DES',
+    'RSA+AES128',
+    'RSA+AES256',
+    'RSA+3DES',
+]
+
+riotclient = "RiotClient/60.0.6.4770705.4749685 rso-auth (Windows;10;;Professional, x64)"
 
 class TLSAdapter(HTTPAdapter):
-    def init_poolmanager(self, connections, maxsize, block=False):
-        self.poolmanager = PoolManager(num_pools=connections, maxsize=maxsize, block=block, ssl_version=PROTOCOL_TLSv1_2)
+    def init_poolmanager(self, *args, **kwargs):
+        context = create_urllib3_context(ciphers=':'.join(CIPHERS))
+        kwargs['ssl_context'] = context
+        return super(TLSAdapter, self).init_poolmanager(*args, **kwargs)
 
 def checkLogins(): #Checks if user is logged in, if they are check if the logins are valid or ask for 2fa code
     settings = ConfigParser()
@@ -51,13 +70,13 @@ def getAuth(username, password):
     settings.read("settings.ini")
     enc_key = settings['DEFAULT']['CAPNKEY']
     headers = OrderedDict({
-        "Accept-Language": "en-US,en;q=0.9",
-        "Accept": "application/json, text/plain, */*",
-        'User-Agent': riotclient
-    })
+            'Content-Type': 'application/json',
+            'User-Agent': riotclient,
+            'Accept': 'application/json, text/plain, */*',
+        })
     session = sesh()
     session.headers = headers
-    session.mount('https://', TLSAdapter())
+    session.mount('https://auth.riotgames.com', TLSAdapter())
     data = {
         "client_id": "play-valorant-web-prod",
         "nonce": "1",
@@ -67,7 +86,7 @@ def getAuth(username, password):
     }
     headers = {
         'Content-Type': 'application/json',
-        'User-Agent': riotclient,
+        'User-Agent': riotclient
     }
     r = session.post(f'https://auth.riotgames.com/api/v1/authorization', json=data, headers=headers)
     data = {

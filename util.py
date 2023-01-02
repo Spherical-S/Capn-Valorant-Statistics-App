@@ -17,7 +17,7 @@ weaponsDictionary = {}
 mStatsOutput = []
 mSkinsOutput = {}
 lock = Lock()
-key = "Hidden" #not leaking my api key he he he haw (clash royale king laugh)
+key = "HDEV-e6ef1170-97c4-4f64-9bc8-dfc4e56b65c5" #not leaking my api key he he he haw (clash royale king laugh)
 
 
 def internet():
@@ -365,8 +365,9 @@ def playerStats(i, region, en, t, y, team, agentsDictionary):
         name = nameFromPUUID[0]
     else:
         name = "Hidden"
+    stats = getPlayerStats(y['Players'][i]['Subject'], region, t, en)
     lock.acquire()
-    mStatsOutput[team].append({'puuid': y['Players'][i]['Subject'], 'name': name, 'agent': agentsDictionary[y['Players'][i]['CharacterID']], 'rank': rankData[0], 'rr': rankData[1], 'peak': rankData[2], 'peakSeason': rankData[3]})
+    mStatsOutput[team].append({'puuid': y['Players'][i]['Subject'], 'name': name, 'agent': agentsDictionary[y['Players'][i]['CharacterID']], 'rank': rankData[0], 'rr': rankData[1], 'peak': rankData[2], 'peakSeason': rankData[3], 'stats': stats})
     lock.release()
 
 
@@ -382,8 +383,9 @@ def playerStatsPre(i, region, en, t, y, team, agentsDictionary):
         agent = agentsDictionary[y['AllyTeam']['Players'][i]['CharacterID']]
     else:
         agent = "None"
+    stats = getPlayerStats(y['AllyTeam']['Players'][i]['Subject'], region, t, en)
     lock.acquire()
-    mStatsOutput[team].append({'puuid': y['AllyTeam']['Players'][i]['Subject'], 'name': name, 'agent': agent, 'rank': rankData[0], 'rr': rankData[1], 'peak': rankData[2], 'peakSeason': rankData[3]})
+    mStatsOutput[team].append({'puuid': y['AllyTeam']['Players'][i]['Subject'], 'name': name, 'agent': agent, 'rank': rankData[0], 'rr': rankData[1], 'peak': rankData[2], 'peakSeason': rankData[3], 'stats': stats})
     lock.release()
 
 
@@ -668,3 +670,81 @@ def getNameFromPUUID(puuid, region, token):
     output[0] = response.json()[0]["GameName"]
     output[1] = response.json()[0]["TagLine"]
     return output
+
+
+def getPlayerStats(puuid, region, t, en):
+    url = f"https://pd.{region}.a.pvp.net/match-history/v1/history/{puuid}/?startIndex=0&endIndex=5&queue=competitive"
+    headers = {
+        'X-Riot-Entitlements-JWT': en,
+        'Authorization': f'Bearer {t}',
+        'X-Riot-ClientVersion': getValoVersion(),
+        'X-Riot-ClientPlatform': clientPlatform
+    }
+    r = get(url, headers=headers)
+    if r.status_code != 200:
+        return {'hs': 'N/A', 'wr': 'N/A', "kd": 'N/A', 'last3': [-1, -1, -1]}
+    y = r.json()
+    url = f"https://pd.{region}.a.pvp.net/match-history/v1/history/{puuid}/?startIndex=0&endIndex=5&queue=unrated"
+    r = get(url, headers=headers)
+    if r.status_code != 200:
+        return {'hs': 'N/A', 'wr': 'N/A', "kd": 'N/A', 'last3': [-1, -1, -1]}
+    x = r.json()
+    matchTimes = {}
+    matches = []
+    for i in range(len(x['History'])):
+        matchTimes[int(x['History'][i]['GameStartTime'])] = x['History'][i]['MatchID']
+    for i in range(len(y['History'])):
+        matchTimes[int(y['History'][i]['GameStartTime'])] = y['History'][i]['MatchID']
+    if len(matchTimes.keys()) < 5:
+        return {'hs': 'N/A', 'wr': 'N/A', "kd": 'N/A', 'last3': [-1, -1, -1]}
+    for i in sorted(matchTimes.keys(), reverse=True):
+        matches.append(matchTimes[i])
+        if len(matches) == 5:
+            break
+    matchDatas = []
+    for i in range(5):
+        url = f"https://pd.{region}.a.pvp.net/match-details/v1/matches/{matches[i]}"
+        r = get(url, headers=headers)
+        if r.status_code != 200:
+            return {'hs': 'N/A', 'wr': 'N/A', "kd": 'N/A', 'last3': [-1, -1, -1]}
+        matchDatas.append(r.json())
+    count = 0
+    last3 = [-1, -1, -1]
+    wins = 0
+    losses = 0
+    kills = 0
+    deaths = 0
+    headshots = 0
+    othershots = 0
+    for i in matchDatas:
+        team = ""
+        for j in i['players']:
+            if j['subject'] == puuid:
+                team = j['teamId']
+        for j in i['teams']:
+            if j["teamId"] == team:
+                if j["won"] == True:
+                    if count < 3:
+                        last3[count] = 1
+                    wins += 1
+                else:
+                    if count < 3:
+                        last3[count] = 0
+                    losses += 1
+        for j in i['roundResults']:
+            for k in j['playerStats']:
+                if k['subject'] == puuid:
+                    for l in k['damage']:
+                        headshots += int(l['headshots'])
+                        othershots += int(l['legshots'])
+                        othershots += int(l['bodyshots'])
+        for j in i['kills']:
+            if j['victim'] == puuid:
+                deaths += 1
+            if j['killer'] == puuid:
+                kills += 1
+        count += 1
+    wr = round((wins/(wins+losses))*100)
+    kd = round(kills/deaths, 2)
+    hs = round((headshots/othershots)*100)
+    return {'hs': f'{hs}%', 'wr': f'{wr}%', "kd": f'{kd}', 'last3': last3}

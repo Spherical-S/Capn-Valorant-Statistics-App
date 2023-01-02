@@ -1086,7 +1086,7 @@ try: # Put it all in a try... except to catch all errors and log them
     settings.read('settings.ini')
     PURPLE = settings['DEFAULT']['bg']
     BLACK = settings['DEFAULT']['fg']
-    current_version = "1.1.3"
+    current_version = "1.1.4"
     region = ""
     enc_key = "0"
     selected_command = 0
