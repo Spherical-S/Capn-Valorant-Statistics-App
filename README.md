@@ -1,4 +1,4 @@
-[![github](https://cdn.discordapp.com/attachments/983104763199639562/1061778049349189642/Untitled-2.png)]([https://ko-fi.com/Y8Y0C2CAM](https://github.com/Spherical-S/Capn-Valorant-Statistics-App/releases)) [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Y8Y0C2CAM)
+[![github](https://cdn.discordapp.com/attachments/983104763199639562/1061778049349189642/Untitled-2.png)](https://github.com/Spherical-S/Capn-Valorant-Statistics-App/releases) [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Y8Y0C2CAM)
 
 # CAPN - Valorant Statistics App
 Version: 1.1.4
