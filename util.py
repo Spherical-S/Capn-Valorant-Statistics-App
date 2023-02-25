@@ -85,18 +85,18 @@ def getActs():
     url = 'https://valorant-api.com/v1/seasons'
     r = get(url)
     y = r.json()
-    episode = 0
+    episode = 1
     acts = {}
     for i in range(len(y['data'])):
-        if (i - 1) % 4 == 0:
-            episode += 1
-        elif i == 0:
+        if i == 0:
             continue
-        elif (i - 1) % 4 == 1:
+        if i % 4 == 0:
+            episode += 1
+        elif i % 4 == 1:
             acts['E' + str(episode) + 'A1'] = y['data'][i]['uuid']
-        elif (i - 1) % 4 == 2:
+        elif i % 4 == 2:
             acts['E' + str(episode) + 'A2'] = y['data'][i]['uuid']
-        elif (i - 1) % 4 == 3:
+        elif i % 4 == 3:
             acts['E' + str(episode) + 'A3'] = y['data'][i]['uuid']
     return acts
 
@@ -125,11 +125,14 @@ def getCurrentSeason():
     url = 'https://valorant-api.com/v1/seasons'
     r = get(url)
     y = r.json()
-    episode = 0
+    episode = 1
     count = 0
     currentDate = int(datetime.today().strftime('%Y%m%d'))
     for i in y['data']:
-        if (count - 1) % 4 == 0:
+        if count == 0:
+            count += 1
+            continue
+        if count % 4 == 0:
             episode += 1
         else:
             seStart = i['startTime'][0:indexOf(i['startTime'], 'T')]
@@ -137,11 +140,11 @@ def getCurrentSeason():
             seStart = seStart[0:4] + seStart[5:7] + seStart[8:10]
             seEnd = seEnd[0:4] + seEnd[5:7] + seEnd[8:10]
             if currentDate >= int(seStart) and currentDate <= int(seEnd):
-                if (count - 1) % 4 == 1:
+                if count % 4 == 1:
                     return f'E{episode}A1'
-                if (count - 1) % 4 == 2:
+                if count % 4 == 2:
                     return f'E{episode}A2'
-                if (count - 1) % 4 == 3:
+                if count % 4 == 3:
                     return f'E{episode}A3'
         count += 1
 
@@ -184,6 +187,10 @@ def getRankByName(name, tag, region, act, t, en):
     # 150: unranked but has had a max rank
     # 200: all data present
     # 100: player has not played ranked in the given act
+    ranks = {0: "UNRANKED", 1: "UNRANKED", 2: "UNRANKED", 3: "IRON 1", 4: "IRON 2", 5: "IRON 3", 6: "BRONZE 1",
+             7: "BRONZE 2", 8: "BRONZE 3", 9: "SILVER 1", 10: "SILVER 2", 11: "SILVER 3", 12: "GOLD 1", 13: "GOLD 2",
+             14: "GOLD 3", 15: "PLAT 1", 16: "PLAT 2", 17: "PLAT 3", 18: "DIA 1", 19: "DIA 2", 20: "DIA 3",
+             21: "ASC 1", 22: "ASC 2", 23: "ASC 3", 24: "IMM 1", 25: "IMM 2", 26: "IMM 3", 27: "RADIANT"}
     xAct = int(act[1:2]) - 1
     actsDictionary = acts
     puuid = getOtherPUUID(name, tag, region)
@@ -224,7 +231,7 @@ def getRankByName(name, tag, region, act, t, en):
             y = r.json()
             try:
                 rankTIER = y["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][actsDictionary[act]]["CompetitiveTier"]
-                rank = x['data'][xAct]['tiers'][rankTIER]['tierName']
+                rank = ranks[rankTIER]
                 if rank == 'UNRANKED':
                     output = [150, "UNRANKED", "N/A", rankTIER, maxrank, maxRank[0], maxSeason, ""]
                     return output
@@ -256,10 +263,10 @@ def MaxRank(region, en, t, puuid):
         'X-Riot-ClientPlatform': clientPlatform
     }
     r = get(url, json={}, headers=headers)
-    if str(r.status_code) != "200":
-        return [-1]
     if str(r.status_code) == "429":
         return [429]
+    if str(r.status_code) != "200":
+        return [-1]
     y = r.json()
     maxRank = [-1, '']
     seasons = y["QueueSkills"]["competitive"].get("SeasonalInfoBySeasonID")
@@ -365,9 +372,8 @@ def playerStats(i, region, en, t, y, team, agentsDictionary):
         name = nameFromPUUID[0]
     else:
         name = "Hidden"
-    stats = getPlayerStats(y['Players'][i]['Subject'], region, t, en)
     lock.acquire()
-    mStatsOutput[team].append({'puuid': y['Players'][i]['Subject'], 'name': name, 'agent': agentsDictionary[y['Players'][i]['CharacterID']], 'rank': rankData[0], 'rr': rankData[1], 'peak': rankData[2], 'peakSeason': rankData[3], 'stats': stats})
+    mStatsOutput[team].append({'puuid': y['Players'][i]['Subject'], 'name': name, 'agent': agentsDictionary[y['Players'][i]['CharacterID']], 'rank': rankData[0], 'rr': rankData[1], 'peak': rankData[2], 'peakSeason': rankData[3]})
     lock.release()
 
 
@@ -383,9 +389,8 @@ def playerStatsPre(i, region, en, t, y, team, agentsDictionary):
         agent = agentsDictionary[y['AllyTeam']['Players'][i]['CharacterID']]
     else:
         agent = "None"
-    stats = getPlayerStats(y['AllyTeam']['Players'][i]['Subject'], region, t, en)
     lock.acquire()
-    mStatsOutput[team].append({'puuid': y['AllyTeam']['Players'][i]['Subject'], 'name': name, 'agent': agent, 'rank': rankData[0], 'rr': rankData[1], 'peak': rankData[2], 'peakSeason': rankData[3], 'stats': stats})
+    mStatsOutput[team].append({'puuid': y['AllyTeam']['Players'][i]['Subject'], 'name': name, 'agent': agent, 'rank': rankData[0], 'rr': rankData[1], 'peak': rankData[2], 'peakSeason': rankData[3]})
     lock.release()
 
 
@@ -504,6 +509,10 @@ def getMatchRanks(region, en, t, puuid):
              "DIAMOND 1": "DIA 1", "DIAMOND 2": "DIA 2", "DIAMOND 3": "DIA 3",
              "ASCENDANT 1": "ASC 1", "ASCENDANT 2": "ASC 2", "ASCENDANT 3": "ASC 3",
              "IMMORTAL 1": "IMM 1", "IMMORTAL 2": "IMM 2", "IMMORTAL 3": "IMM 3"}
+    ranks = {0: "UNRANKED", 1: "UNRANKED", 2: "UNRANKED", 3: "IRON 1", 4: "IRON 2", 5: "IRON 3", 6: "BRONZE 1",
+             7: "BRONZE 2", 8: "BRONZE 3", 9: "SILVER 1", 10: "SILVER 2", 11: "SILVER 3", 12: "GOLD 1", 13: "GOLD 2",
+             14: "GOLD 3", 15: "PLAT 1", 16: "PLAT 2", 17: "PLAT 3", 18: "DIA 1", 19: "DIA 2", 20: "DIA 3",
+             21: "ASC 1", 22: "ASC 2", 23: "ASC 3", 24: "IMM 1", 25: "IMM 2", 26: "IMM 3", 27: "RADIANT"}
     act = getCurrentSeason()
     xAct = int(act[1:2]) - 1
     actsDictionary = acts
@@ -523,9 +532,9 @@ def getMatchRanks(region, en, t, puuid):
         rank = ["UNRANKED", "N/A", "UNRANKED", "E0A0"]
         return rank
     elif maxRank[0] == 429:
-        rank = ["Rate Limit", "N/A", "Rate Limit", "E0A0"]
+        rank = ["Rate Limit, try", "again", "in 1-2", "minutes."]
         return rank
-    maxrank = x['data'][xAct]['tiers'][maxRank[0]]['tierName']
+    maxrank = ranks[maxRank[0]]
     maxSeason = maxRank[1]
     if maxrank in short:
         maxrank = short[maxrank]
@@ -534,7 +543,7 @@ def getMatchRanks(region, en, t, puuid):
     y = r.json()
     try:
         rankTIER = y["QueueSkills"]["competitive"]["SeasonalInfoBySeasonID"][actsDictionary[act]]["CompetitiveTier"]
-        rank = x['data'][xAct]['tiers'][rankTIER]['tierName']
+        rank = ranks[rankTIER]
         if rank in short:
             rank = short[rank]
         if rank == 'UNRANKED':

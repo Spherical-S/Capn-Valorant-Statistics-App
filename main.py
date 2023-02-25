@@ -578,8 +578,6 @@ def displayMatchStats():
             peaks_label.place(x=530, y=120)
             peakSeasons_label.place(x=710, y=120)
         else:
-            for i in range(len(output['players'])):
-                print(output['players'][i]['stats'])
             loading_sublabel.destroy()
             loading_label.destroy()
             displayData = {}
