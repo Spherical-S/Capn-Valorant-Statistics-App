@@ -17,7 +17,7 @@ weaponsDictionary = {}
 mStatsOutput = []
 mSkinsOutput = {}
 lock = Lock()
-key = "HDEV-e6ef1170-97c4-4f64-9bc8-dfc4e56b65c5" #not leaking my api key he he he haw (clash royale king laugh)
+key = "..." #not leaking my api key he he he haw (clash royale king laugh)
 
 
 def internet():
